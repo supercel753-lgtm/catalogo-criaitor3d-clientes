@@ -1,0 +1,770 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color" content="#100c15">
+
+    <meta name="description"
+          content="CriAItor 3D - Brinquedos articulados, colecionáveis e produtos criativos fabricados com impressão 3D.">
+
+    <title>CriAItor 3D | Loja de Impressão 3D</title>
+
+    <!-- FONTES -->
+
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+          rel="stylesheet">
+
+    <!-- CSS -->
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- CATÁLOGO -->
+
+    <script src="catalogo.js" defer></script>
+
+    <!-- FUNCIONALIDADES -->
+
+    <script src="script.js" defer></script>
+
+</head>
+
+<body>
+
+    <!-- ==================================
+         CABEÇALHO
+    ================================== -->
+
+    <header class="cabecalho">
+
+        <div class="cabecalho-conteudo">
+
+            <!-- LOGOTIPO -->
+
+            <a href="#inicio" class="marca">
+
+                <img
+                    src="assets/logo-criaitor3d.png"
+                    alt="Logotipo CriAItor 3D">
+
+                <div class="marca-texto">
+
+                    <strong>
+                        Cri<span>AI</span>tor
+                        <b>3D</b>
+                    </strong>
+
+                    <small>
+                        IMPRESSÃO 3D CRIATIVA
+                    </small>
+
+                </div>
+
+            </a>
+
+
+            <!-- MENU -->
+
+            <nav class="menu" id="menu">
+
+                <a href="#inicio">
+                    Início
+                </a>
+
+                <a href="#produtos">
+                    Produtos
+                </a>
+
+                <a href="#como-funciona">
+                    Como funciona
+                </a>
+
+                <a href="#sobre">
+                    Sobre
+                </a>
+
+                <a href="#contato">
+                    Contato
+                </a>
+
+            </nav>
+
+
+            <!-- AÇÕES -->
+
+            <div class="acoes">
+
+                <button
+                    class="botao-menu"
+                    id="botao-menu"
+                    type="button"
+                    aria-label="Abrir menu"
+                    aria-expanded="false">
+
+                    ☰
+
+                </button>
+
+
+                <button
+                    class="botao-carrinho"
+                    id="abrir-carrinho"
+                    type="button">
+
+                    🛒 Carrinho
+
+                    <span id="contador-carrinho">
+                        0
+                    </span>
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <main>
+
+        <!-- ==================================
+             INÍCIO
+        ================================== -->
+
+        <section class="hero" id="inicio">
+
+            <div class="hero-conteudo">
+
+                <div class="hero-texto">
+
+                    <span class="etiqueta-hero">
+
+                        ✦ CRIATIVIDADE EM CADA CAMADA
+
+                    </span>
+
+
+                    <h1>
+
+                        Sua imaginação
+
+                        <span>ganha forma</span>
+
+                        em 3D.
+
+                    </h1>
+
+
+                    <p>
+
+                        Brinquedos articulados,
+                        colecionáveis, acessórios
+                        e criações exclusivas
+                        produzidas com tecnologia
+                        de impressão 3D.
+
+                    </p>
+
+
+                    <div class="hero-botoes">
+
+                        <a
+                            href="#produtos"
+                            class="botao botao-laranja">
+
+                            Explorar produtos →
+
+                        </a>
+
+
+                        <a
+                            href="#como-funciona"
+                            class="botao botao-contorno">
+
+                            Como funciona
+
+                        </a>
+
+                    </div>
+
+
+                    <div class="hero-destaques">
+
+                        <span>
+                            ✦ Impressão 3D
+                        </span>
+
+                        <span>
+                            ✦ Produtos criativos
+                        </span>
+
+                        <span>
+                            ✦ Feito sob encomenda
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hero-imagem">
+
+                    <div class="circulo-roxo"></div>
+
+                    <img
+                        src="assets/logo-criaitor3d.png"
+                        alt="CriAItor 3D - Impressão 3D">
+
+                    <span class="etiqueta-flutuante">
+
+                        CRIATIVIDADE SEM LIMITES
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==================================
+             PRODUTOS
+        ================================== -->
+
+        <section class="secao-produtos" id="produtos">
+
+            <div class="titulo-secao">
+
+                <div>
+
+                    <span class="subtitulo">
+                        NOSSO CATÁLOGO
+                    </span>
+
+
+                    <h2>
+
+                        Explore nossas
+
+                        <em>criações.</em>
+
+                    </h2>
+
+
+                    <p>
+
+                        Descubra produtos
+                        criativos e personalizados,
+                        produzidos em impressão 3D.
+
+                    </p>
+
+                </div>
+
+
+                <span class="quantidade-produtos"
+                      id="quantidade-produtos">
+
+                    0 produtos
+
+                </span>
+
+            </div>
+
+
+            <!-- PESQUISA E FILTROS -->
+
+            <div class="barra-filtros">
+
+                <div class="campo-busca">
+
+                    <span aria-hidden="true">⌕</span>
+
+                    <input
+                        type="search"
+                        id="buscar-produto"
+                        placeholder="Buscar produtos..."
+                        aria-label="Buscar produtos">
+
+                </div>
+
+
+                <div class="filtros" id="filtros">
+
+                    <!-- Gerados pelo JavaScript -->
+
+                </div>
+
+            </div>
+
+
+            <!-- CATÁLOGO -->
+
+            <div class="grade-produtos"
+                 id="grade-produtos">
+
+                <!-- Produtos gerados automaticamente -->
+
+            </div>
+
+
+            <!-- MENSAGEM QUANDO NÃO HOUVER PRODUTOS -->
+
+            <div
+                class="mensagem-vazia"
+                id="mensagem-vazia"
+                hidden>
+
+                <h3>
+                    Nenhum produto encontrado.
+                </h3>
+
+                <p>
+                    Experimente pesquisar por
+                    outro nome ou categoria.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==================================
+             COMO FUNCIONA
+        ================================== -->
+
+        <section
+            class="secao-como-funciona"
+            id="como-funciona">
+
+            <div class="titulo-central">
+
+                <span class="subtitulo">
+                    DO DIGITAL PARA O REAL
+                </span>
+
+
+                <h2>
+
+                    Como a mágica
+
+                    <em>acontece?</em>
+
+                </h2>
+
+
+                <p>
+
+                    Cada criação começa
+                    com uma ideia e ganha
+                    forma camada por camada.
+
+                </p>
+
+            </div>
+
+
+            <div class="grade-passos">
+
+                <div class="cartao-passo">
+
+                    <div class="icone-passo">
+                        🛍️
+                    </div>
+
+                    <span class="numero-passo">
+                        01
+                    </span>
+
+
+                    <h3>
+                        Escolha seu produto
+                    </h3>
+
+
+                    <p>
+
+                        Explore nosso catálogo
+                        e escolha os produtos
+                        que combinam com você.
+
+                    </p>
+
+                </div>
+
+
+                <div class="cartao-passo">
+
+                    <div class="icone-passo">
+                        🖨️
+                    </div>
+
+                    <span class="numero-passo">
+                        02
+                    </span>
+
+
+                    <h3>
+                        Produção 3D
+                    </h3>
+
+
+                    <p>
+
+                        Após a confirmação
+                        do pedido, preparamos
+                        a produção das suas peças.
+
+                    </p>
+
+                </div>
+
+
+                <div class="cartao-passo">
+
+                    <div class="icone-passo">
+                        📦
+                    </div>
+
+                    <span class="numero-passo">
+                        03
+                    </span>
+
+
+                    <h3>
+                        Receba sua criação
+                    </h3>
+
+
+                    <p>
+
+                        Combinamos os detalhes
+                        da entrega ou retirada
+                        diretamente com você.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==================================
+             SOBRE
+        ================================== -->
+
+        <section class="secao-sobre" id="sobre">
+
+            <div class="sobre-imagem">
+
+                <img
+                    src="assets/logo-criaitor3d.png"
+                    alt="Identidade visual CriAItor 3D">
+
+            </div>
+
+
+            <div class="sobre-texto">
+
+                <span class="subtitulo">
+
+                    CONHEÇA A CRIAITOR 3D
+
+                </span>
+
+
+                <h2>
+
+                    Criatividade que
+
+                    <em>ganha vida.</em>
+
+                </h2>
+
+
+                <p>
+
+                    A CriAItor 3D transforma
+                    ideias em objetos reais
+                    por meio da impressão 3D.
+
+                </p>
+
+
+                <p>
+
+                    Nosso catálogo reúne
+                    brinquedos articulados,
+                    produtos sensoriais,
+                    colecionáveis e acessórios
+                    criativos.
+
+                </p>
+
+
+                <a
+                    href="#produtos"
+                    class="botao botao-laranja">
+
+                    Conheça nossas criações →
+
+                </a>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==================================
+             CONTATO
+        ================================== -->
+
+        <section class="secao-contato" id="contato">
+
+            <div class="contato-conteudo">
+
+                <span class="subtitulo">
+
+                    TEM UMA IDEIA EM MENTE?
+
+                </span>
+
+
+                <h2>
+
+                    Vamos criar
+
+                    <em>algo incrível?</em>
+
+                </h2>
+
+
+                <p>
+
+                    Entre em contato para
+                    consultar produtos,
+                    disponibilidade,
+                    personalizações e prazos.
+
+                </p>
+
+
+                <a
+                    href="#"
+                    class="botao botao-laranja"
+                    id="link-whatsapp"
+                    target="_blank"
+                    rel="noopener noreferrer">
+
+                    Conversar pelo WhatsApp →
+
+                </a>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- ==================================
+         CARRINHO DE COMPRAS
+    ================================== -->
+
+    <div
+        class="fundo-carrinho"
+        id="fundo-carrinho">
+    </div>
+
+
+    <aside
+        class="painel-carrinho"
+        id="painel-carrinho"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Carrinho de compras"
+        aria-hidden="true"
+        inert>
+
+
+        <div class="carrinho-cabecalho">
+
+            <div>
+
+                <span class="subtitulo">
+                    SUAS ESCOLHAS
+                </span>
+
+
+                <h2>
+                    Meu carrinho
+                </h2>
+
+            </div>
+
+
+            <button
+                class="fechar-carrinho"
+                id="fechar-carrinho"
+                type="button"
+                aria-label="Fechar carrinho">
+
+                ×
+
+            </button>
+
+        </div>
+
+
+        <div
+            class="itens-carrinho"
+            id="itens-carrinho">
+
+            <!-- Itens do carrinho -->
+
+        </div>
+
+
+        <div class="carrinho-rodape">
+
+            <div class="resumo-carrinho">
+
+                <span>
+                    Total dos produtos
+                </span>
+
+
+                <strong id="valor-total">
+
+                    R$ 0,00
+
+                </strong>
+
+            </div>
+
+
+            <p class="observacao-carrinho">
+
+                Frete, prazo de produção
+                e disponibilidade serão
+                confirmados pelo WhatsApp.
+
+            </p>
+
+
+            <button
+                class="botao-finalizar"
+                id="finalizar-pedido"
+                type="button">
+
+                Finalizar pelo WhatsApp →
+
+            </button>
+
+
+            <button
+                class="botao-limpar"
+                id="limpar-carrinho"
+                type="button">
+
+                Limpar carrinho
+
+            </button>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ==================================
+         RODAPÉ
+    ================================== -->
+
+    <footer class="rodape">
+
+        <div class="rodape-conteudo">
+
+            <div class="rodape-marca">
+
+                <img
+                    src="assets/logo-criaitor3d.png"
+                    alt="CriAItor 3D">
+
+
+                <div>
+
+                    <h3>
+                        CriAItor 3D
+                    </h3>
+
+                    <p>
+                        Sua imaginação ganha forma.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="rodape-links">
+
+                <a href="#inicio">
+                    Início
+                </a>
+
+                <a href="#produtos">
+                    Produtos
+                </a>
+
+                <a href="#sobre">
+                    Sobre
+                </a>
+
+                <a href="#contato">
+                    Contato
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div class="rodape-final">
+
+            © 2026 CriAItor 3D.
+            Todos os direitos reservados.
+
+        </div>
+
+    </footer>
+
+
+    <!-- NOTIFICAÇÕES -->
+
+    <div
+        class="notificacao"
+        id="notificacao"
+        role="status"
+        aria-live="polite">
+    </div>
+
+</body>
+
+</html>
