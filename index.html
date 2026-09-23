@@ -3,6 +3,7 @@
 <html lang="pt-BR">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -17,18 +18,22 @@
 
     <meta
         name="description"
-        content="CriAItor 3D - Brinquedos articulados, colecionáveis e produtos criativos fabricados com impressão 3D."
+        content="CriAItor 3D - Brinquedos articulados, colecionáveis, acessórios e produtos criativos fabricados com impressão 3D."
     >
 
-    <title>CriAItor 3D | Loja de Impressão 3D</title>
+    <title>
+        CriAItor 3D | Loja de Impressão 3D
+    </title>
 
-    <!-- LOGO NA ABA DO NAVEGADOR -->
+
+    <!-- ÍCONE DA ABA DO NAVEGADOR -->
 
     <link
         rel="icon"
         type="image/png"
         href="assets/logo-criaitor3d.png"
     >
+
 
     <!-- FONTES -->
 
@@ -48,53 +53,67 @@
         rel="stylesheet"
     >
 
-    <!-- CSS -->
 
-    <link rel="stylesheet" href="style.css">
+    <!-- CSS PRINCIPAL -->
 
-    <!-- SUPABASE -->
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+
+    <!-- BIBLIOTECA SUPABASE -->
 
     <script
         src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-        defer>
-    </script>
+        defer
+    ></script>
+
+
+    <!-- CONFIGURAÇÃO DO SUPABASE -->
 
     <script
         src="supabase-config.js"
-        defer>
-    </script>
+        defer
+    ></script>
+
 
     <!-- CATÁLOGO, CARRINHO E WHATSAPP -->
 
     <script
         src="script.js"
-        defer>
-    </script>
+        defer
+    ></script>
 
 </head>
 
+
 <body data-area="clientes">
 
-    <!-- CABEÇALHO -->
+
+    <!-- =====================================
+         CABEÇALHO
+    ===================================== -->
 
     <header class="cabecalho">
 
         <div class="cabecalho-conteudo">
 
-            <!-- LOGO COMPLETA E NÃO CLICÁVEL -->
+
+            <!-- LOGOTIPO CONTROLADO PELO CSS -->
 
             <div class="marca">
 
-                <img
-                    src="assets/logo-criaitor3d.png"
-                    alt="CriAItor 3D"
-                    class="logo-completa"
-                    draggable="false"
-                >
+                <div
+                    class="logo-criaitor logo-cabecalho"
+                    role="img"
+                    aria-label="CriAItor 3D"
+                ></div>
 
             </div>
 
-            <!-- MENU -->
+
+            <!-- MENU PRINCIPAL -->
 
             <nav
                 class="menu"
@@ -102,19 +121,28 @@
                 aria-label="Menu principal"
             >
 
-                <a href="#inicio">Início</a>
+                <a href="#inicio">
+                    Início
+                </a>
 
-                <a href="#produtos">Produtos</a>
+                <a href="#produtos">
+                    Produtos
+                </a>
 
                 <a href="#como-funciona">
                     Como funciona
                 </a>
 
-                <a href="#sobre">Sobre</a>
+                <a href="#sobre">
+                    Sobre
+                </a>
 
-                <a href="#contato">Contato</a>
+                <a href="#contato">
+                    Contato
+                </a>
 
             </nav>
+
 
             <!-- BOTÕES -->
 
@@ -130,6 +158,7 @@
                 >
                     ☰
                 </button>
+
 
                 <button
                     type="button"
@@ -152,31 +181,47 @@
 
     </header>
 
-    <!-- CONTEÚDO PRINCIPAL -->
+
+    <!-- =====================================
+         CONTEÚDO PRINCIPAL
+    ===================================== -->
 
     <main>
 
-        <!-- INÍCIO -->
 
-        <section class="hero" id="inicio">
+        <!-- PÁGINA INICIAL -->
+
+        <section
+            class="hero"
+            id="inicio"
+        >
 
             <div class="hero-conteudo">
+
+
+                <!-- APRESENTAÇÃO -->
 
                 <div class="hero-texto">
 
                     <span class="etiqueta-hero">
+
                         ✦ CRIATIVIDADE EM CADA CAMADA
+
                     </span>
+
 
                     <h1>
 
                         Sua imaginação
 
-                        <span>ganha forma</span>
+                        <span>
+                            ganha forma
+                        </span>
 
                         em 3D.
 
                     </h1>
+
 
                     <p>
 
@@ -188,6 +233,7 @@
 
                     </p>
 
+
                     <div class="hero-botoes">
 
                         <a
@@ -196,6 +242,7 @@
                         >
                             Explorar produtos →
                         </a>
+
 
                         <a
                             href="#como-funciona"
@@ -206,33 +253,42 @@
 
                     </div>
 
+
                     <div class="hero-destaques">
 
-                        <span>✦ Impressão 3D</span>
+                        <span>
+                            ✦ Impressão 3D
+                        </span>
 
-                        <span>✦ Produtos criativos</span>
+                        <span>
+                            ✦ Produtos criativos
+                        </span>
 
-                        <span>✦ Feito sob encomenda</span>
+                        <span>
+                            ✦ Produção sob encomenda
+                        </span>
 
                     </div>
 
                 </div>
 
-                <!-- LOGO COMPLETA NA PÁGINA INICIAL -->
+
+                <!-- LOGO PRINCIPAL -->
 
                 <div class="hero-imagem">
 
                     <div class="circulo-roxo"></div>
 
-                    <img
-                        src="assets/logo-criaitor3d.png"
-                        alt="CriAItor 3D - Sua imaginação ganha forma"
-                        class="logo-hero"
-                        draggable="false"
-                    >
+                    <div
+                        class="logo-criaitor logo-hero"
+                        role="img"
+                        aria-label="Logotipo da CriAItor 3D"
+                    ></div>
 
                     <span class="etiqueta-flutuante">
+
                         CRIATIVIDADE SEM LIMITES
+
                     </span>
 
                 </div>
@@ -241,7 +297,10 @@
 
         </section>
 
-        <!-- CATÁLOGO -->
+
+        <!-- =====================================
+             CATÁLOGO DE PRODUTOS
+        ===================================== -->
 
         <section
             class="secao-produtos"
@@ -257,19 +316,24 @@
                     </span>
 
                     <h2>
+
                         Explore nossas
+
                         <em>criações.</em>
+
                     </h2>
 
                     <p>
 
-                        Descubra produtos criativos
-                        e personalizados, produzidos
-                        em impressão 3D.
+                        Descubra brinquedos,
+                        acessórios, colecionáveis
+                        e produtos personalizados
+                        fabricados em impressão 3D.
 
                     </p>
 
                 </div>
+
 
                 <span
                     class="quantidade-produtos"
@@ -280,13 +344,16 @@
 
             </div>
 
-            <!-- BUSCA E FILTROS -->
+
+            <!-- PESQUISA E FILTROS -->
 
             <div class="barra-filtros">
 
                 <div class="campo-busca">
 
-                    <span aria-hidden="true">⌕</span>
+                    <span aria-hidden="true">
+                        ⌕
+                    </span>
 
                     <input
                         type="search"
@@ -297,13 +364,15 @@
 
                 </div>
 
+
                 <div
                     class="filtros"
                     id="filtros"
-                    aria-label="Filtros de produtos"
+                    aria-label="Categorias de produtos"
                 ></div>
 
             </div>
+
 
             <!-- PRODUTOS DO SUPABASE -->
 
@@ -311,7 +380,14 @@
                 class="grade-produtos"
                 id="grade-produtos"
                 aria-live="polite"
-            ></div>
+            >
+
+                Carregando produtos...
+
+            </div>
+
+
+            <!-- NENHUM PRODUTO ENCONTRADO -->
 
             <div
                 class="mensagem-vazia"
@@ -319,18 +395,26 @@
                 hidden
             >
 
-                <h3>Nenhum produto encontrado.</h3>
+                <h3>
+                    Nenhum produto encontrado.
+                </h3>
 
                 <p>
+
                     Experimente pesquisar por
-                    outro nome ou categoria.
+                    outro nome ou selecionar
+                    outra categoria.
+
                 </p>
 
             </div>
 
         </section>
 
-        <!-- COMO FUNCIONA -->
+
+        <!-- =====================================
+             COMO FUNCIONA
+        ===================================== -->
 
         <section
             class="secao-como-funciona"
@@ -344,8 +428,11 @@
                 </span>
 
                 <h2>
+
                     Como a mágica
+
                     <em>acontece?</em>
+
                 </h2>
 
                 <p>
@@ -358,67 +445,92 @@
 
             </div>
 
+
             <div class="grade-passos">
 
-                <div class="cartao-passo">
 
-                    <div class="icone-passo">🛍️</div>
+                <article class="cartao-passo">
 
-                    <span class="numero-passo">01</span>
+                    <div class="icone-passo">
+                        🛍️
+                    </div>
 
-                    <h3>Escolha seu produto</h3>
+                    <span class="numero-passo">
+                        01
+                    </span>
+
+                    <h3>
+                        Escolha seu produto
+                    </h3>
 
                     <p>
 
                         Explore nosso catálogo
-                        e escolha os produtos
-                        que combinam com você.
+                        e escolha suas criações
+                        favoritas.
 
                     </p>
 
-                </div>
+                </article>
 
-                <div class="cartao-passo">
 
-                    <div class="icone-passo">🖨️</div>
+                <article class="cartao-passo">
 
-                    <span class="numero-passo">02</span>
+                    <div class="icone-passo">
+                        🖨️
+                    </div>
 
-                    <h3>Produção 3D</h3>
+                    <span class="numero-passo">
+                        02
+                    </span>
+
+                    <h3>
+                        Produção 3D
+                    </h3>
 
                     <p>
 
                         Após a confirmação do pedido,
-                        preparamos a produção das suas
-                        peças utilizando impressão 3D.
+                        iniciamos a produção das peças
+                        utilizando impressão 3D.
 
                     </p>
 
-                </div>
+                </article>
 
-                <div class="cartao-passo">
 
-                    <div class="icone-passo">📦</div>
+                <article class="cartao-passo">
 
-                    <span class="numero-passo">03</span>
+                    <div class="icone-passo">
+                        📦
+                    </div>
 
-                    <h3>Receba sua criação</h3>
+                    <span class="numero-passo">
+                        03
+                    </span>
+
+                    <h3>
+                        Receba sua criação
+                    </h3>
 
                     <p>
 
                         Combinamos os detalhes
-                        da entrega ou retirada
+                        de entrega ou retirada
                         diretamente com você.
 
                     </p>
 
-                </div>
+                </article>
 
             </div>
 
         </section>
 
-        <!-- SOBRE A EMPRESA -->
+
+        <!-- =====================================
+             SOBRE A EMPRESA
+        ===================================== -->
 
         <section
             class="secao-sobre"
@@ -427,51 +539,59 @@
 
             <div class="sobre-imagem">
 
-                <img
-                    src="assets/logo-criaitor3d.png"
-                    alt="Identidade visual da CriAItor 3D"
-                    class="logo-sobre"
-                    draggable="false"
-                >
+                <div
+                    class="logo-criaitor logo-sobre"
+                    role="img"
+                    aria-label="CriAItor 3D"
+                ></div>
 
             </div>
+
 
             <div class="sobre-texto">
 
                 <span class="subtitulo">
+
                     CONHEÇA A CRIAITOR 3D
+
                 </span>
 
+
                 <h2>
+
                     Criatividade que
+
                     <em>ganha vida.</em>
+
                 </h2>
 
-                <p>
-
-                    A CriAItor 3D transforma
-                    ideias em objetos reais
-                    por meio da impressão 3D.
-
-                </p>
 
                 <p>
 
-                    Nosso catálogo reúne
-                    brinquedos articulados,
-                    produtos sensoriais,
-                    colecionáveis e acessórios
-                    criativos.
+                    A CriAItor 3D transforma ideias
+                    em objetos reais por meio
+                    da tecnologia de impressão 3D.
 
                 </p>
+
 
                 <p>
 
-                    Cada criação combina
-                    criatividade, tecnologia
-                    e personalização.
+                    Nosso catálogo reúne brinquedos
+                    articulados, colecionáveis,
+                    produtos sensoriais, acessórios
+                    e diversas criações personalizadas.
 
                 </p>
+
+
+                <p>
+
+                    Cada criação combina criatividade,
+                    tecnologia e atenção aos detalhes.
+
+                </p>
+
 
                 <a
                     href="#produtos"
@@ -484,7 +604,10 @@
 
         </section>
 
-        <!-- CONTATO -->
+
+        <!-- =====================================
+             CONTATO
+        ===================================== -->
 
         <section
             class="secao-contato"
@@ -494,21 +617,30 @@
             <div class="contato-conteudo">
 
                 <span class="subtitulo">
+
                     TEM UMA IDEIA EM MENTE?
+
                 </span>
 
+
                 <h2>
+
                     Vamos criar
+
                     <em>algo incrível?</em>
+
                 </h2>
+
 
                 <p>
 
                     Entre em contato para consultar
                     produtos, disponibilidade,
-                    personalizações e prazos.
+                    personalizações e prazos
+                    de produção.
 
                 </p>
+
 
                 <a
                     href="#contato"
@@ -526,13 +658,17 @@
 
     </main>
 
-    <!-- CARRINHO -->
+
+    <!-- =====================================
+         CARRINHO DE COMPRAS
+    ===================================== -->
 
     <div
         class="fundo-carrinho"
         id="fundo-carrinho"
         aria-hidden="true"
     ></div>
+
 
     <aside
         class="painel-carrinho"
@@ -552,9 +688,12 @@
                     SUAS ESCOLHAS
                 </span>
 
-                <h2>Meu carrinho</h2>
+                <h2>
+                    Meu carrinho
+                </h2>
 
             </div>
+
 
             <button
                 type="button"
@@ -567,22 +706,27 @@
 
         </div>
 
+
         <div
             class="itens-carrinho"
             id="itens-carrinho"
         ></div>
 
+
         <div class="carrinho-rodape">
 
             <div class="resumo-carrinho">
 
-                <span>Total dos produtos</span>
+                <span>
+                    Total dos produtos
+                </span>
 
                 <strong id="valor-total">
                     R$ 0,00
                 </strong>
 
             </div>
+
 
             <p class="observacao-carrinho">
 
@@ -592,6 +736,7 @@
 
             </p>
 
+
             <button
                 type="button"
                 class="botao-finalizar"
@@ -600,6 +745,7 @@
             >
                 Finalizar pelo WhatsApp →
             </button>
+
 
             <button
                 type="button"
@@ -613,44 +759,53 @@
 
     </aside>
 
-    <!-- RODAPÉ -->
+
+    <!-- =====================================
+         RODAPÉ
+    ===================================== -->
 
     <footer class="rodape">
 
         <div class="rodape-conteudo">
 
+
             <div class="rodape-marca">
 
-                <img
-                    src="assets/logo-criaitor3d.png"
-                    alt="CriAItor 3D"
-                    class="logo-rodape"
-                    draggable="false"
-                >
+                <div
+                    class="logo-criaitor logo-rodape"
+                    role="img"
+                    aria-label="CriAItor 3D"
+                ></div>
 
-                <div>
-
-                    <p>
-                        Sua imaginação ganha forma.
-                    </p>
-
-                </div>
+                <p>
+                    Sua imaginação ganha forma.
+                </p>
 
             </div>
 
+
             <div class="rodape-links">
 
-                <a href="#inicio">Início</a>
+                <a href="#inicio">
+                    Início
+                </a>
 
-                <a href="#produtos">Produtos</a>
+                <a href="#produtos">
+                    Produtos
+                </a>
 
-                <a href="#sobre">Sobre</a>
+                <a href="#sobre">
+                    Sobre
+                </a>
 
-                <a href="#contato">Contato</a>
+                <a href="#contato">
+                    Contato
+                </a>
 
             </div>
 
         </div>
+
 
         <div class="rodape-final">
 
@@ -660,6 +815,7 @@
         </div>
 
     </footer>
+
 
     <!-- NOTIFICAÇÕES -->
 
