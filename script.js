@@ -1,32 +1,31 @@
 
-// ==========================================
-// CRIAITOR 3D - LOJA DOS CLIENTES
-// ==========================================
+/*
+==========================================
+CRIAITOR 3D
+LOJA DOS CLIENTES
+SUPABASE + CARRINHO + WHATSAPP
+==========================================
+*/
 
 "use strict";
 
 
 // ==========================================
-// CONFIGURAÇÕES DA LOJA
+// CONFIGURAÇÕES
 // ==========================================
 
-// IMPORTANTE:
-//
-// Substitua pelo WhatsApp da sua empresa.
-//
-// Formato:
-// DDI + DDD + número
-//
-// Exemplo fictício:
-// 5551999999999
+// SUBSTITUA PELO WHATSAPP DA EMPRESA.
+// Informe DDI + DDD + número.
 
 const WHATSAPP_LOJA = "5551999999999";
 
 
-const CHAVE_CARRINHO = "criaitor3d_carrinho_v1";
+const CHAVE_CARRINHO =
+    "criaitor3d_carrinho_v1";
 
 
-const IMAGEM_PADRAO = "assets/logo-criaitor3d.png";
+const IMAGEM_PADRAO =
+    "assets/logo-criaitor3d.png";
 
 
 const moeda = new Intl.NumberFormat("pt-BR", {
@@ -42,33 +41,53 @@ const $ = id => document.getElementById(id);
 
 
 // ==========================================
-// CARREGAR PRODUTOS
+// CATÁLOGO
 // ==========================================
 
-const catalogo = window.CRIAITOR_CATALOGO;
+let produtos = [];
+
+let categoriaAtual = "todos";
+
+let versaoAtual = -1;
 
 
-const produtos = Array.isArray(catalogo?.produtos)
+// ==========================================
+// CARRINHO
+// ==========================================
 
-    ? catalogo.produtos.filter(produto =>
+let carrinho = [];
 
-        produto &&
 
-        typeof produto.id === "string" &&
+try {
 
-        produto.id.length > 0 &&
+    const salvos = JSON.parse(
+        localStorage.getItem(CHAVE_CARRINHO)
+    );
 
-        produto.disponivel === true &&
 
-        typeof produto.nome === "string" &&
+    if (Array.isArray(salvos)) {
 
-        Number.isFinite(produto.preco) &&
+        carrinho = salvos.filter(item =>
 
-        produto.preco >= 0
+            item &&
 
-    )
+            typeof item.id === "string" &&
 
-    : [];
+            Number.isSafeInteger(item.quantidade) &&
+
+            item.quantidade > 0
+
+        );
+
+    }
+
+} catch (erro) {
+
+    console.error(erro);
+
+    carrinho = [];
+
+}
 
 
 // ==========================================
@@ -77,27 +96,24 @@ const produtos = Array.isArray(catalogo?.produtos)
 
 function formatarPreco(valor) {
 
-    return moeda.format(valor);
+    return moeda.format(Number(valor) || 0);
 
 }
 
 
-function criarElemento(tag, texto = "", classe = "") {
+function elemento(tag, texto = "", classe = "") {
 
-    const elemento = document.createElement(tag);
+    const el = document.createElement(tag);
 
-
-    elemento.textContent = String(texto ?? "");
-
+    el.textContent = String(texto ?? "");
 
     if (classe) {
 
-        elemento.className = classe;
+        el.className = classe;
 
     }
 
-
-    return elemento;
+    return el;
 
 }
 
@@ -116,10 +132,7 @@ function criarImagem(produto) {
     const caminho = String(produto.imagem || "");
 
 
-    // Aceita imagens da pasta assets
-    // ou endereços HTTP/HTTPS.
-
-    imagem.src = /^(https?:\/\/|assets\/)[^\s]*$/i.test(caminho)
+    imagem.src = /^(https:\/\/|assets\/)[^\s]*$/i.test(caminho)
 
         ? caminho
 
@@ -149,21 +162,21 @@ let temporizadorNotificacao;
 
 function notificar(mensagem) {
 
-    const elemento = $("notificacao");
+    const aviso = $("notificacao");
 
 
     clearTimeout(temporizadorNotificacao);
 
 
-    elemento.textContent = mensagem;
+    aviso.textContent = mensagem;
 
 
-    elemento.classList.add("visivel");
+    aviso.classList.add("visivel");
 
 
     temporizadorNotificacao = setTimeout(() => {
 
-        elemento.classList.remove("visivel");
+        aviso.classList.remove("visivel");
 
     }, 3000);
 
@@ -175,7 +188,6 @@ function notificar(mensagem) {
 // ==========================================
 
 const botaoMenu = $("botao-menu");
-
 
 const menu = $("menu");
 
@@ -220,26 +232,14 @@ menu.querySelectorAll("a").forEach(link => {
 
         );
 
-
-        botaoMenu.setAttribute(
-
-            "aria-label",
-
-            "Abrir menu"
-
-        );
-
     });
 
 });
 
 
 // ==========================================
-// FILTROS DO CATÁLOGO
+// FILTROS
 // ==========================================
-
-let categoriaAtual = "todos";
-
 
 function criarFiltros() {
 
@@ -257,13 +257,7 @@ function criarFiltros() {
 
             produtos.map(produto => produto.categoria)
 
-                .filter(categoria =>
-
-                    typeof categoria === "string" &&
-
-                    categoria.trim().length > 0
-
-                )
+                .filter(Boolean)
 
         )
 
@@ -272,14 +266,12 @@ function criarFiltros() {
 
     categorias.forEach(categoria => {
 
-        const botao = criarElemento(
+        const botao = elemento(
 
             "button",
 
             categoria === "todos"
-
                 ? "Todos"
-
                 : categoria,
 
             "filtro"
@@ -294,16 +286,7 @@ function criarFiltros() {
 
             "ativo",
 
-            categoria === categoriaAtual
-
-        );
-
-
-        botao.setAttribute(
-
-            "aria-pressed",
-
-            String(categoria === categoriaAtual)
+            categoriaAtual === categoria
 
         );
 
@@ -329,33 +312,25 @@ function criarFiltros() {
 
 
 // ==========================================
-// PESQUISA DE PRODUTOS
-// ==========================================
-
-$("buscar-produto").addEventListener(
-
-    "input",
-
-    mostrarProdutos
-
-);
-
-
-// ==========================================
-// CRIAR CARTÃO DE PRODUTO
+// CRIAR CARTÃO DO PRODUTO
 // ==========================================
 
 function criarCartaoProduto(produto) {
 
-    const cartao = document.createElement("article");
+    const cartao = elemento(
 
+        "article",
 
-    cartao.className = "produto";
+        "",
+
+        "produto"
+
+    );
 
 
     // IMAGEM
 
-    const areaImagem = criarElemento(
+    const areaImagem = elemento(
 
         "div",
 
@@ -373,45 +348,47 @@ function criarCartaoProduto(produto) {
     );
 
 
-    // ETIQUETA DE PRODUÇÃO
+    // PRAZO
 
     if (produto.prazo) {
 
-        const etiquetaProducao = criarElemento(
+        areaImagem.appendChild(
 
-            "span",
+            elemento(
 
-            produto.prazo,
+                "span",
 
-            "etiqueta-producao"
+                produto.prazo,
+
+                "etiqueta-producao"
+
+            )
 
         );
-
-
-        areaImagem.appendChild(etiquetaProducao);
 
     }
 
 
     // CATEGORIA
 
-    const etiquetaCategoria = criarElemento(
+    areaImagem.appendChild(
 
-        "span",
+        elemento(
 
-        produto.categoria || "Impressão 3D",
+            "span",
 
-        "etiqueta-categoria"
+            produto.categoria || "Impressão 3D",
+
+            "etiqueta-categoria"
+
+        )
 
     );
 
 
-    areaImagem.appendChild(etiquetaCategoria);
-
-
     // CONTEÚDO
 
-    const conteudo = criarElemento(
+    const conteudo = elemento(
 
         "div",
 
@@ -428,7 +405,7 @@ function criarCartaoProduto(produto) {
 
         conteudo.appendChild(
 
-            criarElemento(
+            elemento(
 
                 "span",
 
@@ -447,7 +424,7 @@ function criarCartaoProduto(produto) {
 
     conteudo.appendChild(
 
-        criarElemento(
+        elemento(
 
             "h3",
 
@@ -464,7 +441,7 @@ function criarCartaoProduto(produto) {
 
     conteudo.appendChild(
 
-        criarElemento(
+        elemento(
 
             "p",
 
@@ -477,9 +454,9 @@ function criarCartaoProduto(produto) {
     );
 
 
-    // RODAPÉ DO PRODUTO
+    // PREÇO
 
-    const rodape = criarElemento(
+    const rodape = elemento(
 
         "div",
 
@@ -495,7 +472,7 @@ function criarCartaoProduto(produto) {
 
     areaPreco.append(
 
-        criarElemento(
+        elemento(
 
             "span",
 
@@ -506,7 +483,7 @@ function criarCartaoProduto(produto) {
         ),
 
 
-        criarElemento(
+        elemento(
 
             "strong",
 
@@ -519,9 +496,9 @@ function criarCartaoProduto(produto) {
     );
 
 
-    // BOTÃO ADICIONAR
+    // ADICIONAR AO CARRINHO
 
-    const botaoAdicionar = criarElemento(
+    const botaoAdicionar = elemento(
 
         "button",
 
@@ -569,7 +546,7 @@ function criarCartaoProduto(produto) {
 
 
 // ==========================================
-// EXIBIR CATÁLOGO
+// EXIBIR PRODUTOS
 // ==========================================
 
 function mostrarProdutos() {
@@ -602,7 +579,9 @@ function mostrarProdutos() {
         ].join(" ").toLocaleLowerCase("pt-BR");
 
 
-        const correspondePesquisa = texto.includes(pesquisa);
+        const correspondePesquisa =
+
+            texto.includes(pesquisa);
 
 
         const correspondeCategoria =
@@ -628,14 +607,10 @@ function mostrarProdutos() {
     });
 
 
-    // CONTADOR
-
     $("quantidade-produtos").textContent =
 
         `${filtrados.length} produto(s)`;
 
-
-    // MENSAGEM SEM RESULTADOS
 
     $("mensagem-vazia").hidden =
 
@@ -645,48 +620,16 @@ function mostrarProdutos() {
 
 
 // ==========================================
-// CARRINHO - ARMAZENAMENTO
+// PESQUISA
 // ==========================================
 
-let carrinho = [];
+$("buscar-produto").addEventListener(
 
+    "input",
 
-try {
+    mostrarProdutos
 
-    const carrinhoSalvo = JSON.parse(
-
-        localStorage.getItem(CHAVE_CARRINHO)
-
-    );
-
-
-    if (Array.isArray(carrinhoSalvo)) {
-
-        carrinho = carrinhoSalvo.filter(item =>
-
-            item &&
-
-            typeof item.id === "string" &&
-
-            Number.isSafeInteger(item.quantidade) &&
-
-            item.quantidade > 0 &&
-
-            produtos.some(produto =>
-
-                produto.id === item.id
-
-            )
-
-        );
-
-    }
-
-} catch {
-
-    carrinho = [];
-
-}
+);
 
 
 // ==========================================
@@ -705,13 +648,9 @@ function salvarCarrinho() {
 
         );
 
-    } catch {
+    } catch (erro) {
 
-        notificar(
-
-            "Não foi possível salvar o carrinho neste navegador."
-
-        );
+        console.error(erro);
 
     }
 
@@ -719,7 +658,7 @@ function salvarCarrinho() {
 
 
 // ==========================================
-// ADICIONAR PRODUTO AO CARRINHO
+// ADICIONAR AO CARRINHO
 // ==========================================
 
 function adicionarAoCarrinho(id) {
@@ -731,23 +670,19 @@ function adicionarAoCarrinho(id) {
     );
 
 
-    if (!produto) {
-
-        return;
-
-    }
+    if (!produto) return;
 
 
-    const itemExistente = carrinho.find(
+    const existente = carrinho.find(
 
         item => item.id === id
 
     );
 
 
-    if (itemExistente) {
+    if (existente) {
 
-        itemExistente.quantidade += 1;
+        existente.quantidade++;
 
     } else {
 
@@ -771,7 +706,7 @@ function adicionarAoCarrinho(id) {
     abrirPainelCarrinho();
 
 
-    notificar("Produto adicionado ao carrinho!");
+    notificar("Produto adicionado!");
 
 }
 
@@ -789,11 +724,7 @@ function alterarQuantidade(id, variacao) {
     );
 
 
-    if (!item) {
-
-        return;
-
-    }
+    if (!item) return;
 
 
     item.quantidade += variacao;
@@ -831,14 +762,10 @@ function criarItemCarrinho(item) {
     );
 
 
-    if (!produto) {
-
-        return null;
-
-    }
+    if (!produto) return null;
 
 
-    const linha = criarElemento(
+    const linha = elemento(
 
         "div",
 
@@ -849,14 +776,7 @@ function criarItemCarrinho(item) {
     );
 
 
-    // IMAGEM
-
-    const imagem = criarImagem(produto);
-
-
-    // INFORMAÇÕES
-
-    const informacoes = criarElemento(
+    const informacoes = elemento(
 
         "div",
 
@@ -869,7 +789,7 @@ function criarItemCarrinho(item) {
 
     informacoes.append(
 
-        criarElemento(
+        elemento(
 
             "h3",
 
@@ -878,7 +798,7 @@ function criarItemCarrinho(item) {
         ),
 
 
-        criarElemento(
+        elemento(
 
             "p",
 
@@ -893,9 +813,7 @@ function criarItemCarrinho(item) {
     );
 
 
-    // CONTROLE DE QUANTIDADE
-
-    const controles = criarElemento(
+    const controles = elemento(
 
         "div",
 
@@ -906,9 +824,7 @@ function criarItemCarrinho(item) {
     );
 
 
-    // DIMINUIR
-
-    const diminuir = criarElemento(
+    const diminuir = elemento(
 
         "button",
 
@@ -936,9 +852,7 @@ function criarItemCarrinho(item) {
     });
 
 
-    // QUANTIDADE ATUAL
-
-    const quantidade = criarElemento(
+    const quantidade = elemento(
 
         "strong",
 
@@ -947,9 +861,7 @@ function criarItemCarrinho(item) {
     );
 
 
-    // AUMENTAR
-
-    const aumentar = criarElemento(
+    const aumentar = elemento(
 
         "button",
 
@@ -993,7 +905,7 @@ function criarItemCarrinho(item) {
 
     linha.append(
 
-        imagem,
+        criarImagem(produto),
 
         informacoes
 
@@ -1026,11 +938,11 @@ function atualizarCarrinho() {
 
         area.appendChild(
 
-            criarElemento(
+            elemento(
 
                 "p",
 
-                "Seu carrinho está vazio. Explore nosso catálogo e escolha suas criações favoritas!",
+                "Seu carrinho está vazio.",
 
                 "carrinho-vazio"
 
@@ -1045,16 +957,12 @@ function atualizarCarrinho() {
 
         const produto = produtos.find(
 
-            elemento => elemento.id === item.id
+            p => p.id === item.id
 
         );
 
 
-        if (!produto) {
-
-            return;
-
-        }
+        if (!produto) return;
 
 
         quantidadeTotal += item.quantidade;
@@ -1063,12 +971,12 @@ function atualizarCarrinho() {
         total += produto.preco * item.quantidade;
 
 
-        const elemento = criarItemCarrinho(item);
+        const linha = criarItemCarrinho(item);
 
 
-        if (elemento) {
+        if (linha) {
 
-            area.appendChild(elemento);
+            area.appendChild(linha);
 
         }
 
@@ -1097,7 +1005,6 @@ function atualizarCarrinho() {
 // ==========================================
 
 const painelCarrinho = $("painel-carrinho");
-
 
 const fundoCarrinho = $("fundo-carrinho");
 
@@ -1199,8 +1106,6 @@ fundoCarrinho.addEventListener(
 );
 
 
-// FECHAR COM ESC
-
 document.addEventListener("keydown", evento => {
 
     if (
@@ -1224,25 +1129,12 @@ document.addEventListener("keydown", evento => {
 
 $("limpar-carrinho").addEventListener("click", () => {
 
-    if (carrinho.length === 0) {
-
-        return;
-
-    }
+    if (!carrinho.length) return;
 
 
-    const confirmar = confirm(
-
-        "Deseja remover todos os produtos do carrinho?"
-
-    );
-
-
-    if (!confirmar) {
-
-        return;
-
-    }
+    if (!confirm(
+        "Deseja limpar o carrinho?"
+    )) return;
 
 
     carrinho = [];
@@ -1253,123 +1145,386 @@ $("limpar-carrinho").addEventListener("click", () => {
 
     atualizarCarrinho();
 
-
-    notificar("Carrinho esvaziado.");
-
 });
 
 
 // ==========================================
-// FINALIZAR PEDIDO PELO WHATSAPP
+// FINALIZAR PEDIDO
 // ==========================================
 
-$("finalizar-pedido").addEventListener("click", () => {
+$("finalizar-pedido").addEventListener(
 
-    if (carrinho.length === 0) {
+    "click",
 
-        notificar("Adicione produtos ao carrinho.");
+    () => {
 
-        return;
+        if (!carrinho.length) {
 
-    }
-
-
-    let total = 0;
-
-
-    let mensagem =
-
-        "Olá! Gostaria de solicitar um pedido na CriAItor 3D.\n\n" +
-
-        "🛒 MEU PEDIDO\n\n";
-
-
-    carrinho.forEach(item => {
-
-        const produto = produtos.find(
-
-            elemento => elemento.id === item.id
-
-        );
-
-
-        if (!produto) {
+            notificar("Seu carrinho está vazio.");
 
             return;
 
         }
 
 
-        const subtotal =
+        if (
+            WHATSAPP_LOJA === "5551999999999" ||
+            !/^\d{12,15}$/.test(WHATSAPP_LOJA)
+        ) {
 
-            produto.preco * item.quantidade;
+            alert(
+
+                "O WhatsApp da CriAItor 3D " +
+                "ainda não foi configurado."
+
+            );
+
+            return;
+
+        }
 
 
-        total += subtotal;
+        let total = 0;
+
+
+        let mensagem =
+
+            "Olá! Gostaria de fazer um pedido na CriAItor 3D.\n\n" +
+
+            "MEU PEDIDO:\n\n";
+
+
+        carrinho.forEach(item => {
+
+            const produto = produtos.find(
+
+                p => p.id === item.id
+
+            );
+
+
+            if (!produto) return;
+
+
+            const subtotal =
+
+                produto.preco * item.quantidade;
+
+
+            total += subtotal;
+
+
+            mensagem +=
+
+                `• ${produto.nome}\n` +
+
+                `Quantidade: ${item.quantidade}\n` +
+
+                `Subtotal: ${formatarPreco(subtotal)}\n\n`;
+
+        });
 
 
         mensagem +=
 
-            `• ${produto.nome}\n` +
+            `TOTAL: ${formatarPreco(total)}\n\n` +
 
-            `Quantidade: ${item.quantidade}\n` +
+            "Gostaria de confirmar a disponibilidade, " +
 
-            `Preço unitário: ${formatarPreco(produto.preco)}\n` +
+            "o prazo de produção e a entrega.";
 
-            `Subtotal: ${formatarPreco(subtotal)}\n\n`;
+
+        const url =
+
+            `https://wa.me/${WHATSAPP_LOJA}?text=` +
+
+            encodeURIComponent(mensagem);
+
+
+        window.open(
+
+            url,
+
+            "_blank",
+
+            "noopener,noreferrer"
+
+        );
+
+    }
+
+);
+
+
+// ==========================================
+// CONTATO PELO WHATSAPP
+// ==========================================
+
+const linkWhatsApp = $("link-whatsapp");
+
+
+linkWhatsApp.href =
+
+    `https://wa.me/${WHATSAPP_LOJA}?text=` +
+
+    encodeURIComponent(
+
+        "Olá! Gostaria de conhecer os produtos da CriAItor 3D."
+
+    );
+
+
+// ==========================================
+// APLICAR CATÁLOGO DO SUPABASE
+// ==========================================
+
+function aplicarCatalogo(dados) {
+
+    if (!dados || !Array.isArray(dados.produtos)) {
+
+        console.error("Catálogo inválido.");
+
+        return;
+
+    }
+
+
+    const versaoRecebida = Number(
+        dados.versao
+    );
+
+
+    if (
+
+        !Number.isFinite(versaoRecebida) ||
+
+        versaoRecebida < versaoAtual
+
+    ) {
+
+        return;
+
+    }
+
+
+    versaoAtual = versaoRecebida;
+
+
+    // Atualiza apenas produtos disponíveis.
+
+    produtos = dados.produtos.filter(produto =>
+
+        produto &&
+
+        typeof produto.id === "string" &&
+
+        typeof produto.nome === "string" &&
+
+        Number.isFinite(produto.preco) &&
+
+        produto.preco >= 0 &&
+
+        produto.disponivel === true
+
+    );
+
+
+    // Remove do carrinho produtos
+    // excluídos ou indisponíveis.
+
+    carrinho = carrinho.filter(item =>
+
+        produtos.some(
+
+            produto => produto.id === item.id
+
+        )
+
+    );
+
+
+    salvarCarrinho();
+
+
+    // Atualiza categorias.
+
+    const categorias = produtos.map(
+
+        produto => produto.categoria
+
+    );
+
+
+    if (
+
+        categoriaAtual !== "todos" &&
+
+        !categorias.includes(categoriaAtual)
+
+    ) {
+
+        categoriaAtual = "todos";
+
+    }
+
+
+    // Reconstrói a interface.
+
+    criarFiltros();
+
+    mostrarProdutos();
+
+    atualizarCarrinho();
+
+
+    console.log(
+
+        "CriAItor 3D: catálogo atualizado.",
+
+        versaoAtual
+
+    );
+
+}
+
+
+// ==========================================
+// BUSCAR CATÁLOGO NO SUPABASE
+// ==========================================
+
+async function carregarCatalogo() {
+
+    const { data, error } = await window.sb
+
+        .from("catalogo")
+
+        .select("produtos, versao")
+
+        .eq("id", 1)
+
+        .single();
+
+
+    if (error) {
+
+        console.error(error);
+
+
+        if (versaoAtual === -1) {
+
+            $("grade-produtos").textContent =
+
+                "Não foi possível carregar os produtos. " +
+
+                "Verifique sua conexão.";
+
+        }
+
+
+        return;
+
+    }
+
+
+    aplicarCatalogo(data);
+
+}
+
+
+// ==========================================
+// SINCRONIZAÇÃO EM TEMPO REAL
+// ==========================================
+
+const canal = window.sb
+
+    .channel("criaitor3d-catalogo-clientes")
+
+    .on(
+
+        "postgres_changes",
+
+        {
+
+            event: "UPDATE",
+
+            schema: "public",
+
+            table: "catalogo",
+
+            filter: "id=eq.1"
+
+        },
+
+        () => {
+
+            // Busca os dados mais recentes
+            // quando o banco é atualizado.
+
+            carregarCatalogo();
+
+        }
+
+    )
+
+    .subscribe(status => {
+
+        if (status === "SUBSCRIBED") {
+
+            carregarCatalogo();
+
+        }
 
     });
 
 
-    mensagem +=
+// ==========================================
+// RECUPERAÇÃO DA CONEXÃO
+// ==========================================
 
-        `TOTAL DOS PRODUTOS: ${formatarPreco(total)}\n\n` +
+// Se a conexão em tempo real cair,
+// a loja consulta o catálogo novamente
+// a cada 45 segundos.
 
-        "Gostaria de confirmar a disponibilidade, o prazo de produção e as opções de entrega ou retirada.";
+setInterval(() => {
+
+    if (!document.hidden) {
+
+        carregarCatalogo();
+
+    }
+
+}, 45000);
 
 
-    const endereco =
+// Quando o cliente voltar à aba,
+// verifica a versão atualizada.
 
-        `https://wa.me/${WHATSAPP_LOJA}?text=` +
+document.addEventListener(
 
-        encodeURIComponent(mensagem);
+    "visibilitychange",
 
+    () => {
 
-    window.open(
+        if (!document.hidden) {
 
-        endereco,
+            carregarCatalogo();
 
-        "_blank",
+        }
 
-        "noopener,noreferrer"
+    }
 
-    );
-
-});
+);
 
 
 // ==========================================
-// BOTÃO DE CONTATO PELO WHATSAPP
+// INICIAR LOJA
 // ==========================================
 
-const mensagemContato =
-
-    "Olá! Gostaria de conhecer melhor os produtos da CriAItor 3D.";
-
-
-$("link-whatsapp").href =
-
-    `https://wa.me/${WHATSAPP_LOJA}?text=` +
-
-    encodeURIComponent(mensagemContato);
+$("grade-produtos").textContent =
+    "Carregando produtos da CriAItor 3D...";
 
 
-// ==========================================
-// INICIALIZAR LOJA
-// ==========================================
+$("finalizar-pedido").disabled = true;
 
-criarFiltros();
 
-mostrarProdutos();
-
-atualizarCarrinho();
+carregarCatalogo();
