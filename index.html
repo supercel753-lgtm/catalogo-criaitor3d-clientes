@@ -25,16 +25,20 @@
     </title>
 
 
-    <!-- LOGO / FAVICON -->
+    <!-- =========================================
+         FAVICON
+    ========================================== -->
 
     <link
         rel="icon"
         type="image/jpeg"
-        href="./assets/logo-criaitor3d.jpg"
+        href="./assets/logo-criaitor3d.jpeg"
     >
 
 
-    <!-- FONTES -->
+    <!-- =========================================
+         FONTES
+    ========================================== -->
 
     <link
         rel="preconnect"
@@ -53,15 +57,44 @@
     >
 
 
-    <!-- CSS -->
+    <!-- =========================================
+         CSS
+    ========================================== -->
 
     <link
         rel="stylesheet"
-        href="./style.css?v=20260928-3"
+        href="./style.css?v=20260928-4"
     >
 
 
-    <!-- SUPABASE -->
+    <!-- =========================================
+         CSS DE SEGURANÇA
+    ========================================== -->
+
+    <style>
+
+        html,
+        body {
+            margin: 0;
+            min-height: 100%;
+            background: #100c15;
+            color: #ffffff;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        img {
+            max-width: 100%;
+        }
+
+    </style>
+
+
+    <!-- =========================================
+         SUPABASE
+    ========================================== -->
 
     <script
         src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
@@ -69,18 +102,22 @@
     ></script>
 
 
-    <!-- CONFIGURAÇÃO -->
+    <!-- =========================================
+         CONFIGURAÇÃO SUPABASE
+    ========================================== -->
 
     <script
-        src="./supabase-config.js?v=20260928-3"
+        src="./supabase-config.js?v=20260928-4"
         defer
     ></script>
 
 
-    <!-- LOJA -->
+    <!-- =========================================
+         SCRIPT DA LOJA
+    ========================================== -->
 
     <script
-        src="./script.js?v=20260928-3"
+        src="./script.js?v=20260928-4"
         defer
     ></script>
 
@@ -90,16 +127,16 @@
 <body>
 
 
-    <!-- ==============================================
+    <!-- ==================================================
          CABEÇALHO
-    =============================================== -->
+    =================================================== -->
 
     <header class="cabecalho">
 
         <div class="cabecalho-interno">
 
 
-            <!-- LOGO JPG -->
+            <!-- LOGO -->
 
             <a
                 href="#inicio"
@@ -108,7 +145,7 @@
             >
 
                 <img
-                    src="./assets/logo-criaitor3d.jpg"
+                    src="./assets/logo-criaitor3d.jpeg"
                     alt="CriAItor 3D"
                     class="logo-cabecalho"
                     draggable="false"
@@ -192,16 +229,16 @@
     </header>
 
 
-    <!-- ==============================================
-         CONTEÚDO
-    =============================================== -->
+    <!-- ==================================================
+         CONTEÚDO PRINCIPAL
+    =================================================== -->
 
     <main>
 
 
-        <!-- ==========================================
+        <!-- ==============================================
              HERO
-        =========================================== -->
+        =============================================== -->
 
         <section
             class="hero"
@@ -210,6 +247,8 @@
 
             <div class="hero-interno">
 
+
+                <!-- TEXTO -->
 
                 <div class="hero-texto">
 
@@ -291,7 +330,7 @@
                     <div class="brilho-logo"></div>
 
                     <img
-                        src="./assets/logo-criaitor3d.jpg"
+                        src="./assets/logo-criaitor3d.jpeg"
                         alt="CriAItor 3D"
                         class="logo-hero"
                         draggable="false"
@@ -304,9 +343,9 @@
         </section>
 
 
-        <!-- ==========================================
+        <!-- ==============================================
              PRODUTOS
-        =========================================== -->
+        =============================================== -->
 
         <section
             class="secao-produtos"
@@ -348,14 +387,19 @@
                 <div class="status-catalogo">
 
                     <span id="quantidade-produtos">
+
                         0 produtos
+
                     </span>
+
 
                     <span
                         class="status-conexao"
                         id="status-conexao"
                     >
+
                         Conectando...
+
                     </span>
 
                 </div>
@@ -363,15 +407,17 @@
             </div>
 
 
-            <!-- BUSCA -->
+            <!-- BUSCA E FILTROS -->
 
             <div class="barra-catalogo">
+
 
                 <div class="campo-busca">
 
                     <span>
                         ⌕
                     </span>
+
 
                     <input
                         type="search"
@@ -383,8 +429,6 @@
                 </div>
 
 
-                <!-- CATEGORIAS -->
-
                 <div
                     class="filtros"
                     id="filtros"
@@ -393,7 +437,7 @@
             </div>
 
 
-            <!-- CARREGANDO -->
+            <!-- CARREGAMENTO -->
 
             <div
                 class="carregando"
@@ -418,23 +462,29 @@
             >
 
                 <h3>
+
                     Não foi possível carregar o catálogo.
+
                 </h3>
 
+
                 <p id="mensagem-erro-catalogo"></p>
+
 
                 <button
                     type="button"
                     class="botao botao-laranja"
                     id="tentar-novamente"
                 >
+
                     Tentar novamente
+
                 </button>
 
             </div>
 
 
-            <!-- PRODUTOS -->
+            <!-- GRADE DE PRODUTOS -->
 
             <div
                 class="grade-produtos"
@@ -442,7 +492,7 @@
             ></div>
 
 
-            <!-- SEM RESULTADO -->
+            <!-- NENHUM PRODUTO -->
 
             <div
                 class="estado-mensagem"
@@ -451,12 +501,17 @@
             >
 
                 <h3>
+
                     Nenhum produto encontrado.
+
                 </h3>
 
+
                 <p>
+
                     Tente pesquisar outro nome
                     ou selecionar outra categoria.
+
                 </p>
 
             </div>
@@ -464,9 +519,9 @@
         </section>
 
 
-        <!-- ==========================================
+        <!-- ==============================================
              COMO FUNCIONA
-        =========================================== -->
+        =============================================== -->
 
         <section
             class="como-funciona"
@@ -483,15 +538,18 @@
 
 
                 <h2>
+
                     Como funciona?
+
                 </h2>
 
 
                 <p>
 
                     Escolha sua criação,
-                    monte o carrinho e fale conosco
-                    para finalizar o pedido.
+                    monte o carrinho
+                    e fale conosco para
+                    finalizar o pedido.
 
                 </p>
 
@@ -592,9 +650,9 @@
 
                     <p>
 
-                        Combinamos a forma de entrega
-                        ou retirada diretamente
-                        com você.
+                        Combinamos a forma
+                        de entrega ou retirada
+                        diretamente com você.
 
                     </p>
 
@@ -605,19 +663,20 @@
         </section>
 
 
-        <!-- ==========================================
+        <!-- ==============================================
              SOBRE
-        =========================================== -->
+        =============================================== -->
 
         <section
             class="sobre"
             id="sobre"
         >
 
+
             <div class="sobre-visual">
 
                 <img
-                    src="./assets/logo-criaitor3d.jpg"
+                    src="./assets/logo-criaitor3d.jpeg"
                     alt="CriAItor 3D"
                     class="logo-sobre"
                     draggable="false"
@@ -646,17 +705,19 @@
 
                 <p>
 
-                    A CriAItor 3D utiliza tecnologia
-                    de impressão 3D para transformar
-                    modelos digitais em produtos físicos.
+                    A CriAItor 3D utiliza
+                    tecnologia de impressão 3D
+                    para transformar modelos digitais
+                    em produtos físicos.
 
                 </p>
 
 
                 <p>
 
-                    Nosso catálogo reúne articulados,
-                    colecionáveis, produtos sensoriais,
+                    Nosso catálogo reúne
+                    articulados, colecionáveis,
+                    produtos sensoriais,
                     acessórios e outras criações.
 
                 </p>
@@ -676,9 +737,9 @@
         </section>
 
 
-        <!-- ==========================================
+        <!-- ==============================================
              CONTATO
-        =========================================== -->
+        =============================================== -->
 
         <section
             class="contato"
@@ -695,15 +756,17 @@
 
 
                 <h2>
+
                     Encontrou algo que gostou?
+
                 </h2>
 
 
                 <p>
 
                     Monte seu carrinho
-                    e envie o pedido diretamente
-                    pelo WhatsApp.
+                    e envie o pedido
+                    diretamente pelo WhatsApp.
 
                 </p>
 
@@ -726,9 +789,9 @@
     </main>
 
 
-    <!-- ==============================================
+    <!-- ==================================================
          FUNDO DO CARRINHO
-    =============================================== -->
+    =================================================== -->
 
     <div
         class="fundo-carrinho"
@@ -736,9 +799,9 @@
     ></div>
 
 
-    <!-- ==============================================
+    <!-- ==================================================
          CARRINHO
-    =============================================== -->
+    =================================================== -->
 
     <aside
         class="carrinho"
@@ -748,14 +811,20 @@
 
         <div class="carrinho-cabecalho">
 
+
             <div>
 
                 <span class="subtitulo">
+
                     SUAS ESCOLHAS
+
                 </span>
 
+
                 <h2>
+
                     Carrinho
+
                 </h2>
 
             </div>
@@ -767,7 +836,9 @@
                 id="fechar-carrinho"
                 aria-label="Fechar carrinho"
             >
+
                 ×
+
             </button>
 
         </div>
@@ -781,14 +852,18 @@
 
         <div class="carrinho-rodape">
 
+
             <div class="linha-total">
 
                 <span>
                     Total
                 </span>
 
+
                 <strong id="total-carrinho">
+
                     R$ 0,00
+
                 </strong>
 
             </div>
@@ -829,9 +904,9 @@
     </aside>
 
 
-    <!-- ==============================================
+    <!-- ==================================================
          RODAPÉ
-    =============================================== -->
+    =================================================== -->
 
     <footer class="rodape">
 
@@ -841,20 +916,26 @@
             <div class="rodape-marca">
 
                 <img
-                    src="./assets/logo-criaitor3d.jpg"
+                    src="./assets/logo-criaitor3d.jpeg"
                     alt="CriAItor 3D"
                     class="logo-rodape"
                     draggable="false"
                 >
 
+
                 <div>
 
                     <strong>
+
                         CriAItor 3D
+
                     </strong>
 
+
                     <p>
+
                         Sua imaginação ganha forma.
+
                     </p>
 
                 </div>
@@ -895,7 +976,9 @@
     </footer>
 
 
-    <!-- NOTIFICAÇÃO -->
+    <!-- ==================================================
+         NOTIFICAÇÃO
+    =================================================== -->
 
     <div
         class="notificacao"
@@ -903,6 +986,7 @@
         role="status"
         aria-live="polite"
     ></div>
+
 
 </body>
 
