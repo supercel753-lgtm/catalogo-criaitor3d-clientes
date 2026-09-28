@@ -1,696 +1,1051 @@
-
-/*
-==========================================
-CRIAITOR 3D
-LOJA DOS CLIENTES
-SUPABASE + CARRINHO + WHATSAPP
-==========================================
-*/
+(function () {
 
 "use strict";
 
 
-// ==========================================
-// CONFIGURAÇÕES
-// ==========================================
+const CONFIG = {
 
-// SUBSTITUA PELO WHATSAPP DA EMPRESA.
-// Informe DDI + DDD + número.
+    tabela:
 
-const WHATSAPP_LOJA = "5551999999999";
+        window.CRIAITOR_CLIENTE_CONFIG
+            ?.tabelaCatalogo ||
+        "catalogo",
 
+    registro:
 
-const CHAVE_CARRINHO =
-    "criaitor3d_carrinho_v1";
+        window.CRIAITOR_CLIENTE_CONFIG
+            ?.registroCatalogo ||
+        1,
 
+    whatsapp:
 
-const IMAGEM_PADRAO =
-    "assets/logo-criaitor3d.png";
+        window.CRIAITOR_CLIENTE_CONFIG
+            ?.whatsapp ||
+        "5551995748186",
 
+    carrinho:
+        "criaitor3d_carrinho",
 
-const moeda = new Intl.NumberFormat("pt-BR", {
+    atualizacao:
+        30000
 
-    style: "currency",
-
-    currency: "BRL"
-
-});
-
-
-const $ = id => document.getElementById(id);
-
-
-// ==========================================
-// CATÁLOGO
-// ==========================================
-
-let produtos = [];
-
-let categoriaAtual = "todos";
-
-let versaoAtual = -1;
+};
 
 
-// ==========================================
-// CARRINHO
-// ==========================================
-
-let carrinho = [];
+const sb =
+    window.sb;
 
 
-try {
+const estado = {
 
-    const salvos = JSON.parse(
-        localStorage.getItem(CHAVE_CARRINHO)
+    produtos: [],
+
+    versao: 0,
+
+    categoria:
+        "Todos",
+
+    pesquisa:
+        "",
+
+    carrinho: [],
+
+    carregando:
+        false,
+
+    canal:
+        null
+
+};
+
+
+const $ = seletor =>
+    document.querySelector(
+        seletor
     );
 
 
-    if (Array.isArray(salvos)) {
+const $$ = seletor =>
+    Array.from(
+        document.querySelectorAll(
+            seletor
+        )
+    );
 
-        carrinho = salvos.filter(item =>
 
-            item &&
+/* ===============================================
+   UTILITÁRIOS
+=============================================== */
 
-            typeof item.id === "string" &&
+function numero(valor) {
 
-            Number.isSafeInteger(item.quantidade) &&
+    const n =
+        Number(valor);
 
-            item.quantidade > 0
+    return Number.isFinite(n)
+        ? n
+        : 0;
 
+}
+
+
+function dinheiro(valor) {
+
+    return new Intl.NumberFormat(
+
+        "pt-BR",
+
+        {
+
+            style:
+                "currency",
+
+            currency:
+                "BRL"
+
+        }
+
+    ).format(
+
+        numero(valor)
+
+    );
+
+}
+
+
+function escaparHTML(valor) {
+
+    return String(valor ?? "")
+
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+
+        .replaceAll(
+            "'",
+            "&#39;"
         );
+
+}
+
+
+function imagemSegura(valor) {
+
+    const url =
+        String(
+            valor || ""
+        ).trim();
+
+
+    if (
+
+        url.startsWith(
+            "https://"
+        )
+
+        ||
+
+        url.startsWith(
+            "http://"
+        )
+
+    ) {
+
+        return url;
 
     }
 
-} catch (erro) {
 
-    console.error(erro);
-
-    carrinho = [];
+    return "";
 
 }
 
 
-// ==========================================
-// FUNÇÕES AUXILIARES
-// ==========================================
+/* ===============================================
+   AVISO
+=============================================== */
 
-function formatarPreco(valor) {
-
-    return moeda.format(Number(valor) || 0);
-
-}
+let timerAviso;
 
 
-function elemento(tag, texto = "", classe = "") {
+function avisar(mensagem) {
 
-    const el = document.createElement(tag);
+    const elemento =
+        $("#notificacao");
 
-    el.textContent = String(texto ?? "");
 
-    if (classe) {
+    if (!elemento) {
 
-        el.className = classe;
+        return;
 
     }
 
-    return el;
 
-}
-
-
-function criarImagem(produto) {
-
-    const imagem = document.createElement("img");
+    elemento.textContent =
+        mensagem;
 
 
-    imagem.alt = produto.nome || "Produto CriAItor 3D";
-
-
-    imagem.loading = "lazy";
-
-
-    const caminho = String(produto.imagem || "");
-
-
-    imagem.src = /^(https:\/\/|assets\/)[^\s]*$/i.test(caminho)
-
-        ? caminho
-
-        : IMAGEM_PADRAO;
-
-
-    imagem.onerror = () => {
-
-        imagem.onerror = null;
-
-        imagem.src = IMAGEM_PADRAO;
-
-    };
-
-
-    return imagem;
-
-}
-
-
-// ==========================================
-// NOTIFICAÇÕES
-// ==========================================
-
-let temporizadorNotificacao;
-
-
-function notificar(mensagem) {
-
-    const aviso = $("notificacao");
-
-
-    clearTimeout(temporizadorNotificacao);
-
-
-    aviso.textContent = mensagem;
-
-
-    aviso.classList.add("visivel");
-
-
-    temporizadorNotificacao = setTimeout(() => {
-
-        aviso.classList.remove("visivel");
-
-    }, 3000);
-
-}
-
-
-// ==========================================
-// MENU RESPONSIVO
-// ==========================================
-
-const botaoMenu = $("botao-menu");
-
-const menu = $("menu");
-
-
-botaoMenu.addEventListener("click", () => {
-
-    const aberto = menu.classList.toggle("aberto");
-
-
-    botaoMenu.setAttribute(
-
-        "aria-expanded",
-
-        String(aberto)
-
+    elemento.classList.add(
+        "visivel"
     );
 
 
-    botaoMenu.setAttribute(
-
-        "aria-label",
-
-        aberto ? "Fechar menu" : "Abrir menu"
-
+    clearTimeout(
+        timerAviso
     );
 
-});
 
+    timerAviso =
+        setTimeout(
 
-menu.querySelectorAll("a").forEach(link => {
+            () => {
 
-    link.addEventListener("click", () => {
+                elemento.classList.remove(
+                    "visivel"
+                );
 
-        menu.classList.remove("aberto");
+            },
 
-
-        botaoMenu.setAttribute(
-
-            "aria-expanded",
-
-            "false"
+            2600
 
         );
 
-    });
-
-});
+}
 
 
-// ==========================================
-// FILTROS
-// ==========================================
+/* ===============================================
+   PRODUTOS VISÍVEIS
+=============================================== */
 
-function criarFiltros() {
+function produtosVisiveis() {
 
-    const area = $("filtros");
+    return estado.produtos.filter(
+
+        produto =>
+
+            produto &&
+            produto.disponivel !== false
+
+    );
+
+}
 
 
-    area.replaceChildren();
+/* ===============================================
+   CARREGAR CATÁLOGO
+=============================================== */
+
+async function carregarCatalogo() {
+
+    if (
+
+        !sb ||
+        estado.carregando
+
+    ) {
+
+        return;
+
+    }
 
 
-    const categorias = [
+    estado.carregando =
+        true;
 
-        "todos",
 
-        ...new Set(
+    $("#carregando").hidden =
+        false;
 
-            produtos.map(produto => produto.categoria)
 
-                .filter(Boolean)
+    $("#erro-catalogo").hidden =
+        true;
+
+
+    try {
+
+        const {
+
+            data,
+
+            error
+
+        } = await sb
+
+            .from(
+                CONFIG.tabela
+            )
+
+            .select(
+                "produtos, versao"
+            )
+
+            .eq(
+                "id",
+                CONFIG.registro
+            )
+
+            .single();
+
+
+        if (error) {
+
+            throw error;
+
+        }
+
+
+        estado.produtos =
+
+            Array.isArray(
+                data.produtos
+            )
+
+                ? data.produtos
+
+                : [];
+
+
+        estado.versao =
+            numero(
+                data.versao
+            );
+
+
+        renderizarTudo();
+
+
+        $("#status-conexao")
+            .textContent =
+
+            "Catálogo atualizado";
+
+
+    } catch (erro) {
+
+        console.error(
+            erro
+        );
+
+
+        $("#erro-catalogo").hidden =
+            false;
+
+
+        $("#mensagem-erro-catalogo")
+            .textContent =
+
+            erro.message;
+
+
+        $("#status-conexao")
+            .textContent =
+
+            "Erro de conexão";
+
+
+    } finally {
+
+        estado.carregando =
+            false;
+
+
+        $("#carregando").hidden =
+            true;
+
+    }
+
+}
+
+
+/* ===============================================
+   CATEGORIAS
+=============================================== */
+
+function categorias() {
+
+    return [
+
+        "Todos",
+
+        ...Array.from(
+
+            new Set(
+
+                produtosVisiveis()
+
+                    .map(
+
+                        produto =>
+
+                            String(
+                                produto.categoria || ""
+                            ).trim()
+
+                    )
+
+                    .filter(Boolean)
+
+            )
+
+        )
+
+        .sort(
+
+            (a, b) =>
+
+                a.localeCompare(
+
+                    b,
+
+                    "pt-BR"
+
+                )
 
         )
 
     ];
 
-
-    categorias.forEach(categoria => {
-
-        const botao = elemento(
-
-            "button",
-
-            categoria === "todos"
-                ? "Todos"
-                : categoria,
-
-            "filtro"
-
-        );
-
-
-        botao.type = "button";
-
-
-        botao.classList.toggle(
-
-            "ativo",
-
-            categoriaAtual === categoria
-
-        );
-
-
-        botao.addEventListener("click", () => {
-
-            categoriaAtual = categoria;
-
-
-            criarFiltros();
-
-
-            mostrarProdutos();
-
-        });
-
-
-        area.appendChild(botao);
-
-    });
-
 }
 
 
-// ==========================================
-// CRIAR CARTÃO DO PRODUTO
-// ==========================================
+function renderizarFiltros() {
 
-function criarCartaoProduto(produto) {
-
-    const cartao = elemento(
-
-        "article",
-
-        "",
-
-        "produto"
-
-    );
+    const lista =
+        categorias();
 
 
-    // IMAGEM
+    if (
 
-    const areaImagem = elemento(
+        !lista.includes(
+            estado.categoria
+        )
 
-        "div",
+    ) {
 
-        "",
-
-        "produto-imagem"
-
-    );
-
-
-    areaImagem.appendChild(
-
-        criarImagem(produto)
-
-    );
-
-
-    // PRAZO
-
-    if (produto.prazo) {
-
-        areaImagem.appendChild(
-
-            elemento(
-
-                "span",
-
-                produto.prazo,
-
-                "etiqueta-producao"
-
-            )
-
-        );
+        estado.categoria =
+            "Todos";
 
     }
 
 
-    // CATEGORIA
+    $("#filtros")
+        .innerHTML =
 
-    areaImagem.appendChild(
+        lista.map(
 
-        elemento(
+            categoria => `
 
-            "span",
+                <button
+                    type="button"
 
-            produto.categoria || "Impressão 3D",
+                    class="filtro ${
+                        categoria === estado.categoria
+                            ? "ativo"
+                            : ""
+                    }"
 
-            "etiqueta-categoria"
+                    data-categoria="${escaparHTML(
+                        categoria
+                    )}"
+                >
 
-        )
+                    ${escaparHTML(
+                        categoria
+                    )}
 
-    );
+                </button>
 
+            `
 
-    // CONTEÚDO
+        ).join("");
 
-    const conteudo = elemento(
-
-        "div",
-
-        "",
-
-        "produto-conteudo"
-
-    );
+}
 
 
-    // DESTAQUE
+/* ===============================================
+   FILTRAR PRODUTOS
+=============================================== */
 
-    if (produto.destaque) {
+function produtosFiltrados() {
 
-        conteudo.appendChild(
+    const pesquisa =
 
-            elemento(
+        estado.pesquisa
 
-                "span",
+        .trim()
 
-                "✦ Destaque",
+        .toLowerCase();
 
-                "produto-destaque"
 
-            )
+    return produtosVisiveis()
+
+        .filter(
+
+            produto => {
+
+                const nome =
+
+                    String(
+                        produto.nome || ""
+                    )
+
+                    .toLowerCase();
+
+
+                const categoria =
+
+                    String(
+                        produto.categoria || ""
+                    )
+
+                    .toLowerCase();
+
+
+                const descricao =
+
+                    String(
+                        produto.descricao || ""
+                    )
+
+                    .toLowerCase();
+
+
+                const filtroCategoria =
+
+                    estado.categoria ===
+                    "Todos"
+
+                    ||
+
+                    produto.categoria ===
+                    estado.categoria;
+
+
+                const filtroPesquisa =
+
+                    !pesquisa
+
+                    ||
+
+                    nome.includes(
+                        pesquisa
+                    )
+
+                    ||
+
+                    categoria.includes(
+                        pesquisa
+                    )
+
+                    ||
+
+                    descricao.includes(
+                        pesquisa
+                    );
+
+
+                return (
+
+                    filtroCategoria &&
+                    filtroPesquisa
+
+                );
+
+            }
 
         );
+
+}
+
+
+/* ===============================================
+   RENDERIZAR PRODUTOS
+=============================================== */
+
+function renderizarProdutos() {
+
+    const lista =
+        produtosFiltrados();
+
+
+    const total =
+        produtosVisiveis().length;
+
+
+    $("#quantidade-produtos")
+        .textContent =
+
+        total === 1
+
+            ? "1 produto"
+
+            : `${total} produtos`;
+
+
+    $("#nenhum-produto").hidden =
+        lista.length > 0;
+
+
+    if (!lista.length) {
+
+        $("#grade-produtos")
+            .innerHTML = "";
+
+        return;
 
     }
 
 
-    // NOME
+    $("#grade-produtos")
+        .innerHTML =
 
-    conteudo.appendChild(
+        lista.map(
 
-        elemento(
+            produto => {
 
-            "h3",
+                const id =
+                    escaparHTML(
+                        produto.id
+                    );
 
-            produto.nome,
 
-            "produto-nome"
+                const nome =
+                    escaparHTML(
+                        produto.nome ||
+                        "Produto"
+                    );
 
-        )
 
-    );
+                const categoria =
+                    escaparHTML(
+                        produto.categoria ||
+                        "CriAItor 3D"
+                    );
 
 
-    // DESCRIÇÃO
+                const descricao =
+                    escaparHTML(
+                        produto.descricao ||
+                        "Produto desenvolvido em impressão 3D."
+                    );
 
-    conteudo.appendChild(
 
-        elemento(
+                const prazo =
+                    escaparHTML(
+                        produto.prazo ||
+                        "Produção sob encomenda"
+                    );
 
-            "p",
 
-            produto.descricao || "",
+                const imagem =
+                    imagemSegura(
+                        produto.imagem
+                    );
 
-            "produto-descricao"
 
-        )
+                const estoque =
 
-    );
+                    Math.max(
 
+                        0,
 
-    // PREÇO
+                        Math.trunc(
 
-    const rodape = elemento(
+                            numero(
+                                produto.estoque
+                            )
 
-        "div",
+                        )
 
-        "",
+                    );
 
-        "produto-rodape"
 
-    );
+                return `
 
+                    <article
+                        class="produto"
+                        data-id="${id}"
+                    >
 
-    const areaPreco = document.createElement("div");
+                        <div class="produto-imagem">
 
+                            ${
 
-    areaPreco.append(
+                                imagem
 
-        elemento(
+                                    ? `
 
-            "span",
+                                        <img
+                                            src="${escaparHTML(
+                                                imagem
+                                            )}"
+                                            alt="${nome}"
+                                            loading="lazy"
+                                        >
 
-            "PREÇO",
+                                    `
 
-            "preco-label"
+                                    : `
 
-        ),
+                                        <div class="produto-sem-imagem">
 
+                                            <strong>
+                                                ◈
+                                            </strong>
 
-        elemento(
+                                            <span>
+                                                CriAItor 3D
+                                            </span>
 
-            "strong",
+                                        </div>
 
-            formatarPreco(produto.preco),
+                                    `
 
-            "preco"
+                            }
 
-        )
 
-    );
+                            <span class="badge-producao">
 
+                                Para produção
 
-    // ADICIONAR AO CARRINHO
+                            </span>
 
-    const botaoAdicionar = elemento(
 
-        "button",
+                            <span class="badge-categoria">
 
-        "🛒 Adicionar",
+                                ${categoria}
 
-        "botao-adicionar"
+                            </span>
 
-    );
+                        </div>
 
 
-    botaoAdicionar.type = "button";
+                        <div class="produto-corpo">
 
 
-    botaoAdicionar.addEventListener("click", () => {
+                            ${
 
-        adicionarAoCarrinho(produto.id);
+                                produto.destaque === true
 
-    });
+                                    ? `
 
+                                        <span class="badge-destaque">
 
-    rodape.append(
+                                            ✦ Destaque
 
-        areaPreco,
+                                        </span>
 
-        botaoAdicionar
+                                    `
 
-    );
+                                    : ""
 
+                            }
 
-    conteudo.appendChild(rodape);
 
+                            <h3>
+                                ${nome}
+                            </h3>
 
-    cartao.append(
 
-        areaImagem,
+                            <p class="produto-descricao">
 
-        conteudo
+                                ${descricao}
 
-    );
+                            </p>
 
 
-    return cartao;
+                            <div class="produto-info">
+
+                                <span>
+                                    ${prazo}
+                                </span>
+
+
+                                ${
+
+                                    estoque > 0
+
+                                        ? `
+
+                                            <span>
+                                                ${estoque}
+                                                em estoque
+                                            </span>
+
+                                        `
+
+                                        : ""
+
+                                }
+
+                            </div>
+
+
+                            <div class="produto-rodape">
+
+                                <div>
+
+                                    <span class="preco-label">
+
+                                        A PARTIR DE
+
+                                    </span>
+
+                                    <strong class="preco">
+
+                                        ${dinheiro(
+                                            produto.preco
+                                        )}
+
+                                    </strong>
+
+                                </div>
+
+
+                                <button
+                                    type="button"
+                                    class="botao-adicionar"
+                                    data-adicionar="${id}"
+                                >
+
+                                    🛒 Adicionar
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                `;
+
+            }
+
+        ).join("");
 
 }
 
 
-// ==========================================
-// EXIBIR PRODUTOS
-// ==========================================
+/* ===============================================
+   RENDERIZAR
+=============================================== */
 
-function mostrarProdutos() {
+function renderizarTudo() {
 
-    const grade = $("grade-produtos");
+    renderizarFiltros();
 
+    renderizarProdutos();
 
-    grade.replaceChildren();
+    reconciliarCarrinho();
 
-
-    const pesquisa = $("buscar-produto")
-
-        .value
-
-        .toLocaleLowerCase("pt-BR")
-
-        .trim();
-
-
-    const filtrados = produtos.filter(produto => {
-
-        const texto = [
-
-            produto.nome,
-
-            produto.categoria,
-
-            produto.descricao
-
-        ].join(" ").toLocaleLowerCase("pt-BR");
-
-
-        const correspondePesquisa =
-
-            texto.includes(pesquisa);
-
-
-        const correspondeCategoria =
-
-            categoriaAtual === "todos" ||
-
-            produto.categoria === categoriaAtual;
-
-
-        return correspondePesquisa && correspondeCategoria;
-
-    });
-
-
-    filtrados.forEach(produto => {
-
-        grade.appendChild(
-
-            criarCartaoProduto(produto)
-
-        );
-
-    });
-
-
-    $("quantidade-produtos").textContent =
-
-        `${filtrados.length} produto(s)`;
-
-
-    $("mensagem-vazia").hidden =
-
-        filtrados.length > 0;
+    renderizarCarrinho();
 
 }
 
 
-// ==========================================
-// PESQUISA
-// ==========================================
+/* ===============================================
+   CARRINHO
+=============================================== */
 
-$("buscar-produto").addEventListener(
-
-    "input",
-
-    mostrarProdutos
-
-);
-
-
-// ==========================================
-// SALVAR CARRINHO
-// ==========================================
-
-function salvarCarrinho() {
+function carregarCarrinho() {
 
     try {
 
-        localStorage.setItem(
+        const bruto =
+            localStorage.getItem(
+                CONFIG.carrinho
+            );
 
-            CHAVE_CARRINHO,
 
-            JSON.stringify(carrinho)
+        const lista =
+            bruto
+                ? JSON.parse(bruto)
+                : [];
 
-        );
 
-    } catch (erro) {
+        estado.carrinho =
+            Array.isArray(lista)
+                ? lista
+                : [];
 
-        console.error(erro);
+
+    } catch {
+
+        estado.carrinho =
+            [];
 
     }
 
 }
 
 
-// ==========================================
-// ADICIONAR AO CARRINHO
-// ==========================================
+function salvarCarrinho() {
 
-function adicionarAoCarrinho(id) {
+    localStorage.setItem(
 
-    const produto = produtos.find(
+        CONFIG.carrinho,
 
-        item => item.id === id
-
-    );
-
-
-    if (!produto) return;
-
-
-    const existente = carrinho.find(
-
-        item => item.id === id
+        JSON.stringify(
+            estado.carrinho
+        )
 
     );
+
+}
+
+
+function encontrarProduto(id) {
+
+    return produtosVisiveis()
+
+        .find(
+
+            produto =>
+
+                String(
+                    produto.id
+                )
+
+                ===
+
+                String(id)
+
+        )
+
+        || null;
+
+}
+
+
+function reconciliarCarrinho() {
+
+    const ids =
+
+        new Set(
+
+            produtosVisiveis()
+
+                .map(
+
+                    produto =>
+                        String(
+                            produto.id
+                        )
+
+                )
+
+        );
+
+
+    estado.carrinho =
+
+        estado.carrinho
+
+        .filter(
+
+            item =>
+
+                ids.has(
+                    String(
+                        item.id
+                    )
+                )
+
+        )
+
+        .map(
+
+            item => ({
+
+                id:
+                    item.id,
+
+                quantidade:
+
+                    Math.max(
+
+                        1,
+
+                        Math.trunc(
+
+                            numero(
+                                item.quantidade
+                            )
+
+                        )
+
+                    )
+
+            })
+
+        );
+
+
+    salvarCarrinho();
+
+}
+
+
+/* ===============================================
+   ADICIONAR
+=============================================== */
+
+function adicionarCarrinho(id) {
+
+    const produto =
+        encontrarProduto(id);
+
+
+    if (!produto) {
+
+        return;
+
+    }
+
+
+    const existente =
+
+        estado.carrinho.find(
+
+            item =>
+
+                String(item.id) ===
+                String(id)
+
+        );
 
 
     if (existente) {
 
-        existente.quantidade++;
+        existente.quantidade += 1;
 
     } else {
 
-        carrinho.push({
+        estado.carrinho.push({
 
-            id: produto.id,
+            id:
+                produto.id,
 
-            quantidade: 1
+            quantidade:
+                1
 
         });
 
@@ -699,468 +1054,564 @@ function adicionarAoCarrinho(id) {
 
     salvarCarrinho();
 
-
-    atualizarCarrinho();
-
-
-    abrirPainelCarrinho();
+    renderizarCarrinho();
 
 
-    notificar("Produto adicionado!");
+    avisar(
+
+        `${produto.nome} adicionado ao carrinho.`
+
+    );
 
 }
 
 
-// ==========================================
-// ALTERAR QUANTIDADE
-// ==========================================
+/* ===============================================
+   QUANTIDADE
+=============================================== */
 
-function alterarQuantidade(id, variacao) {
+function alterarQuantidade(
 
-    const item = carrinho.find(
+    id,
 
-        item => item.id === id
+    diferenca
 
-    );
+) {
 
+    const item =
 
-    if (!item) return;
+        estado.carrinho.find(
 
+            item =>
 
-    item.quantidade += variacao;
-
-
-    if (item.quantidade <= 0) {
-
-        carrinho = carrinho.filter(
-
-            elemento => elemento.id !== id
-
-        );
-
-    }
-
-
-    salvarCarrinho();
-
-
-    atualizarCarrinho();
-
-}
-
-
-// ==========================================
-// CRIAR ITEM DO CARRINHO
-// ==========================================
-
-function criarItemCarrinho(item) {
-
-    const produto = produtos.find(
-
-        elemento => elemento.id === item.id
-
-    );
-
-
-    if (!produto) return null;
-
-
-    const linha = elemento(
-
-        "div",
-
-        "",
-
-        "item-carrinho"
-
-    );
-
-
-    const informacoes = elemento(
-
-        "div",
-
-        "",
-
-        "item-carrinho-info"
-
-    );
-
-
-    informacoes.append(
-
-        elemento(
-
-            "h3",
-
-            produto.nome
-
-        ),
-
-
-        elemento(
-
-            "p",
-
-            formatarPreco(
-
-                produto.preco * item.quantidade
-
-            )
-
-        )
-
-    );
-
-
-    const controles = elemento(
-
-        "div",
-
-        "",
-
-        "controles-quantidade"
-
-    );
-
-
-    const diminuir = elemento(
-
-        "button",
-
-        "−"
-
-    );
-
-
-    diminuir.type = "button";
-
-
-    diminuir.setAttribute(
-
-        "aria-label",
-
-        `Diminuir quantidade de ${produto.nome}`
-
-    );
-
-
-    diminuir.addEventListener("click", () => {
-
-        alterarQuantidade(produto.id, -1);
-
-    });
-
-
-    const quantidade = elemento(
-
-        "strong",
-
-        item.quantidade
-
-    );
-
-
-    const aumentar = elemento(
-
-        "button",
-
-        "+"
-
-    );
-
-
-    aumentar.type = "button";
-
-
-    aumentar.setAttribute(
-
-        "aria-label",
-
-        `Aumentar quantidade de ${produto.nome}`
-
-    );
-
-
-    aumentar.addEventListener("click", () => {
-
-        alterarQuantidade(produto.id, 1);
-
-    });
-
-
-    controles.append(
-
-        diminuir,
-
-        quantidade,
-
-        aumentar
-
-    );
-
-
-    informacoes.appendChild(controles);
-
-
-    linha.append(
-
-        criarImagem(produto),
-
-        informacoes
-
-    );
-
-
-    return linha;
-
-}
-
-
-// ==========================================
-// ATUALIZAR CARRINHO
-// ==========================================
-
-function atualizarCarrinho() {
-
-    const area = $("itens-carrinho");
-
-
-    area.replaceChildren();
-
-
-    let quantidadeTotal = 0;
-
-    let total = 0;
-
-
-    if (carrinho.length === 0) {
-
-        area.appendChild(
-
-            elemento(
-
-                "p",
-
-                "Seu carrinho está vazio.",
-
-                "carrinho-vazio"
-
-            )
-
-        );
-
-    }
-
-
-    carrinho.forEach(item => {
-
-        const produto = produtos.find(
-
-            p => p.id === item.id
+                String(item.id) ===
+                String(id)
 
         );
 
 
-        if (!produto) return;
+    if (!item) {
 
-
-        quantidadeTotal += item.quantidade;
-
-
-        total += produto.preco * item.quantidade;
-
-
-        const linha = criarItemCarrinho(item);
-
-
-        if (linha) {
-
-            area.appendChild(linha);
-
-        }
-
-    });
-
-
-    $("contador-carrinho").textContent =
-
-        quantidadeTotal;
-
-
-    $("valor-total").textContent =
-
-        formatarPreco(total);
-
-
-    $("finalizar-pedido").disabled =
-
-        quantidadeTotal === 0;
-
-}
-
-
-// ==========================================
-// ABRIR E FECHAR CARRINHO
-// ==========================================
-
-const painelCarrinho = $("painel-carrinho");
-
-const fundoCarrinho = $("fundo-carrinho");
-
-
-let focoAnterior = null;
-
-
-function abrirPainelCarrinho() {
-
-    focoAnterior = document.activeElement;
-
-
-    painelCarrinho.inert = false;
-
-
-    painelCarrinho.classList.add("aberto");
-
-
-    fundoCarrinho.classList.add("aberto");
-
-
-    painelCarrinho.setAttribute(
-
-        "aria-hidden",
-
-        "false"
-
-    );
-
-
-    document.body.style.overflow = "hidden";
-
-
-    $("fechar-carrinho").focus();
-
-}
-
-
-function fecharPainelCarrinho() {
-
-    painelCarrinho.classList.remove("aberto");
-
-
-    fundoCarrinho.classList.remove("aberto");
-
-
-    painelCarrinho.setAttribute(
-
-        "aria-hidden",
-
-        "true"
-
-    );
-
-
-    painelCarrinho.inert = true;
-
-
-    document.body.style.overflow = "";
-
-
-    if (focoAnterior?.isConnected) {
-
-        focoAnterior.focus();
-
-    } else {
-
-        $("abrir-carrinho").focus();
+        return;
 
     }
 
-}
 
+    item.quantidade +=
+        diferenca;
 
-$("abrir-carrinho").addEventListener(
-
-    "click",
-
-    abrirPainelCarrinho
-
-);
-
-
-$("fechar-carrinho").addEventListener(
-
-    "click",
-
-    fecharPainelCarrinho
-
-);
-
-
-fundoCarrinho.addEventListener(
-
-    "click",
-
-    fecharPainelCarrinho
-
-);
-
-
-document.addEventListener("keydown", evento => {
 
     if (
 
-        evento.key === "Escape" &&
-
-        painelCarrinho.classList.contains("aberto")
+        item.quantidade <= 0
 
     ) {
 
-        fecharPainelCarrinho();
+        removerCarrinho(id);
+
+        return;
 
     }
-
-});
-
-
-// ==========================================
-// LIMPAR CARRINHO
-// ==========================================
-
-$("limpar-carrinho").addEventListener("click", () => {
-
-    if (!carrinho.length) return;
-
-
-    if (!confirm(
-        "Deseja limpar o carrinho?"
-    )) return;
-
-
-    carrinho = [];
 
 
     salvarCarrinho();
 
+    renderizarCarrinho();
 
-    atualizarCarrinho();
-
-});
+}
 
 
-// ==========================================
-// FINALIZAR PEDIDO
-// ==========================================
+function removerCarrinho(id) {
 
-$("finalizar-pedido").addEventListener(
+    estado.carrinho =
 
-    "click",
+        estado.carrinho.filter(
 
-    () => {
+            item =>
 
-        if (!carrinho.length) {
+                String(item.id) !==
+                String(id)
 
-            notificar("Seu carrinho está vazio.");
+        );
+
+
+    salvarCarrinho();
+
+    renderizarCarrinho();
+
+}
+
+
+/* ===============================================
+   TOTAL
+=============================================== */
+
+function calcularTotal() {
+
+    return estado.carrinho.reduce(
+
+        (
+            total,
+            item
+        ) => {
+
+            const produto =
+                encontrarProduto(
+                    item.id
+                );
+
+
+            if (!produto) {
+
+                return total;
+
+            }
+
+
+            return (
+
+                total +
+
+                numero(
+                    produto.preco
+                )
+
+                *
+
+                item.quantidade
+
+            );
+
+        },
+
+        0
+
+    );
+
+}
+
+
+/* ===============================================
+   RENDERIZAR CARRINHO
+=============================================== */
+
+function renderizarCarrinho() {
+
+    const quantidade =
+
+        estado.carrinho.reduce(
+
+            (
+                total,
+                item
+            ) =>
+
+                total +
+                item.quantidade,
+
+            0
+
+        );
+
+
+    $("#contador-carrinho")
+        .textContent =
+        quantidade;
+
+
+    $("#total-carrinho")
+        .textContent =
+        dinheiro(
+            calcularTotal()
+        );
+
+
+    $("#finalizar-pedido")
+        .disabled =
+        estado.carrinho.length === 0;
+
+
+    if (
+
+        !estado.carrinho.length
+
+    ) {
+
+        $("#itens-carrinho")
+            .innerHTML = `
+
+                <div class="carrinho-vazio">
+
+                    <h3>
+                        Seu carrinho está vazio.
+                    </h3>
+
+                    <p>
+
+                        Escolha uma criação
+                        no catálogo.
+
+                    </p>
+
+                </div>
+
+            `;
+
+        return;
+
+    }
+
+
+    $("#itens-carrinho")
+        .innerHTML =
+
+        estado.carrinho.map(
+
+            item => {
+
+                const produto =
+                    encontrarProduto(
+                        item.id
+                    );
+
+
+                if (!produto) {
+
+                    return "";
+
+                }
+
+
+                const imagem =
+                    imagemSegura(
+                        produto.imagem
+                    );
+
+
+                return `
+
+                    <div class="item-carrinho">
+
+                        ${
+
+                            imagem
+
+                                ? `
+
+                                    <img
+                                        src="${escaparHTML(
+                                            imagem
+                                        )}"
+                                        alt=""
+                                    >
+
+                                `
+
+                                : ""
+
+                        }
+
+
+                        <div class="item-carrinho-conteudo">
+
+                            <h3>
+
+                                ${escaparHTML(
+                                    produto.nome
+                                )}
+
+                            </h3>
+
+
+                            <div class="item-carrinho-preco">
+
+                                ${dinheiro(
+                                    produto.preco
+                                )}
+
+                            </div>
+
+
+                            <div class="quantidade">
+
+                                <button
+                                    type="button"
+                                    data-quantidade="-1"
+                                    data-id="${escaparHTML(
+                                        produto.id
+                                    )}"
+                                >
+                                    −
+                                </button>
+
+
+                                <span>
+                                    ${item.quantidade}
+                                </span>
+
+
+                                <button
+                                    type="button"
+                                    data-quantidade="1"
+                                    data-id="${escaparHTML(
+                                        produto.id
+                                    )}"
+                                >
+                                    +
+                                </button>
+
+
+                                <button
+                                    type="button"
+                                    class="remover-item"
+                                    data-remover="${escaparHTML(
+                                        produto.id
+                                    )}"
+                                >
+
+                                    Remover
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            }
+
+        ).join("");
+
+}
+
+
+/* ===============================================
+   ABRIR CARRINHO
+=============================================== */
+
+function abrirCarrinho() {
+
+    $("#carrinho")
+        .classList.add(
+            "aberto"
+        );
+
+
+    $("#fundo-carrinho")
+        .classList.add(
+            "aberto"
+        );
+
+
+    $("#carrinho")
+        .setAttribute(
+            "aria-hidden",
+            "false"
+        );
+
+
+    document.body
+        .classList.add(
+            "carrinho-aberto"
+        );
+
+}
+
+
+function fecharCarrinho() {
+
+    $("#carrinho")
+        .classList.remove(
+            "aberto"
+        );
+
+
+    $("#fundo-carrinho")
+        .classList.remove(
+            "aberto"
+        );
+
+
+    $("#carrinho")
+        .setAttribute(
+            "aria-hidden",
+            "true"
+        );
+
+
+    document.body
+        .classList.remove(
+            "carrinho-aberto"
+        );
+
+}
+
+
+/* ===============================================
+   WHATSAPP
+=============================================== */
+
+function finalizarPedido() {
+
+    if (
+
+        !estado.carrinho.length
+
+    ) {
+
+        return;
+
+    }
+
+
+    const linhas = [
+
+        "Olá! Gostaria de fazer um pedido na CriAItor 3D.",
+
+        "",
+
+        "*Produtos:*"
+
+    ];
+
+
+    estado.carrinho.forEach(
+
+        item => {
+
+            const produto =
+                encontrarProduto(
+                    item.id
+                );
+
+
+            if (!produto) {
+
+                return;
+
+            }
+
+
+            const subtotal =
+
+                numero(
+                    produto.preco
+                )
+
+                *
+
+                item.quantidade;
+
+
+            linhas.push(
+
+                `• ${item.quantidade}x ${produto.nome} — ${dinheiro(subtotal)}`
+
+            );
+
+        }
+
+    );
+
+
+    linhas.push(
+
+        "",
+
+        `*Total dos produtos: ${dinheiro(
+            calcularTotal()
+        )}*`,
+
+        "",
+
+        "Gostaria de confirmar disponibilidade, cores, prazo e entrega."
+
+    );
+
+
+    const mensagem =
+
+        encodeURIComponent(
+
+            linhas.join(
+                "\n"
+            )
+
+        );
+
+
+    const url =
+
+        "https://wa.me/" +
+
+        CONFIG.whatsapp +
+
+        "?text=" +
+
+        mensagem;
+
+
+    window.open(
+
+        url,
+
+        "_blank",
+
+        "noopener,noreferrer"
+
+    );
+
+}
+
+
+/* ===============================================
+   ATUALIZAÇÕES
+=============================================== */
+
+async function verificarAtualizacoes() {
+
+    if (
+
+        !sb ||
+        estado.carregando
+
+    ) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const {
+
+            data,
+
+            error
+
+        } = await sb
+
+            .from(
+                CONFIG.tabela
+            )
+
+            .select(
+                "versao"
+            )
+
+            .eq(
+                "id",
+                CONFIG.registro
+            )
+
+            .single();
+
+
+        if (error) {
 
             return;
 
@@ -1168,137 +1619,41 @@ $("finalizar-pedido").addEventListener(
 
 
         if (
-            WHATSAPP_LOJA === "5551999999999" ||
-            !/^\d{12,15}$/.test(WHATSAPP_LOJA)
+
+            numero(
+                data.versao
+            )
+
+            !==
+
+            estado.versao
+
         ) {
 
-            alert(
-
-                "O WhatsApp da CriAItor 3D " +
-                "ainda não foi configurado."
-
-            );
-
-            return;
+            await carregarCatalogo();
 
         }
 
 
-        let total = 0;
+    } catch {
 
-
-        let mensagem =
-
-            "Olá! Gostaria de fazer um pedido na CriAItor 3D.\n\n" +
-
-            "MEU PEDIDO:\n\n";
-
-
-        carrinho.forEach(item => {
-
-            const produto = produtos.find(
-
-                p => p.id === item.id
-
-            );
-
-
-            if (!produto) return;
-
-
-            const subtotal =
-
-                produto.preco * item.quantidade;
-
-
-            total += subtotal;
-
-
-            mensagem +=
-
-                `• ${produto.nome}\n` +
-
-                `Quantidade: ${item.quantidade}\n` +
-
-                `Subtotal: ${formatarPreco(subtotal)}\n\n`;
-
-        });
-
-
-        mensagem +=
-
-            `TOTAL: ${formatarPreco(total)}\n\n` +
-
-            "Gostaria de confirmar a disponibilidade, " +
-
-            "o prazo de produção e a entrega.";
-
-
-        const url =
-
-            `https://wa.me/${WHATSAPP_LOJA}?text=` +
-
-            encodeURIComponent(mensagem);
-
-
-        window.open(
-
-            url,
-
-            "_blank",
-
-            "noopener,noreferrer"
-
-        );
+        /* mantém a loja funcionando */
 
     }
 
-);
+}
 
 
-// ==========================================
-// CONTATO PELO WHATSAPP
-// ==========================================
+/* ===============================================
+   REALTIME
+=============================================== */
 
-const linkWhatsApp = $("link-whatsapp");
-
-
-linkWhatsApp.href =
-
-    `https://wa.me/${WHATSAPP_LOJA}?text=` +
-
-    encodeURIComponent(
-
-        "Olá! Gostaria de conhecer os produtos da CriAItor 3D."
-
-    );
-
-
-// ==========================================
-// APLICAR CATÁLOGO DO SUPABASE
-// ==========================================
-
-function aplicarCatalogo(dados) {
-
-    if (!dados || !Array.isArray(dados.produtos)) {
-
-        console.error("Catálogo inválido.");
-
-        return;
-
-    }
-
-
-    const versaoRecebida = Number(
-        dados.versao
-    );
-
+function iniciarRealtime() {
 
     if (
 
-        !Number.isFinite(versaoRecebida) ||
-
-        versaoRecebida < versaoAtual
+        !sb ||
+        estado.canal
 
     ) {
 
@@ -1307,118 +1662,393 @@ function aplicarCatalogo(dados) {
     }
 
 
-    versaoAtual = versaoRecebida;
+    estado.canal =
 
+        sb.channel(
+            "criaitor3d-clientes"
+        )
 
-    // Atualiza apenas produtos disponíveis.
+        .on(
 
-    produtos = dados.produtos.filter(produto =>
+            "postgres_changes",
 
-        produto &&
+            {
 
-        typeof produto.id === "string" &&
+                event:
+                    "UPDATE",
 
-        typeof produto.nome === "string" &&
+                schema:
+                    "public",
 
-        Number.isFinite(produto.preco) &&
+                table:
+                    CONFIG.tabela,
 
-        produto.preco >= 0 &&
+                filter:
+                    `id=eq.${CONFIG.registro}`
 
-        produto.disponivel === true
+            },
 
-    );
+            () => {
 
+                verificarAtualizacoes();
 
-    // Remove do carrinho produtos
-    // excluídos ou indisponíveis.
-
-    carrinho = carrinho.filter(item =>
-
-        produtos.some(
-
-            produto => produto.id === item.id
+            }
 
         )
 
+        .subscribe(
+
+            status => {
+
+                if (
+
+                    status ===
+                    "SUBSCRIBED"
+
+                ) {
+
+                    $("#status-conexao")
+                        .textContent =
+
+                        "Atualização automática ativa";
+
+                }
+
+            }
+
+        );
+
+}
+
+
+/* ===============================================
+   EVENTOS
+=============================================== */
+
+function configurarEventos() {
+
+    $("#botao-menu")
+        .addEventListener(
+
+            "click",
+
+            () => {
+
+                $("#menu-principal")
+                    .classList.toggle(
+                        "aberto"
+                    );
+
+            }
+
+        );
+
+
+    $$("#menu-principal a")
+        .forEach(
+
+            link => {
+
+                link.addEventListener(
+
+                    "click",
+
+                    () => {
+
+                        $("#menu-principal")
+                            .classList.remove(
+                                "aberto"
+                            );
+
+                    }
+
+                );
+
+            }
+
+        );
+
+
+    $("#buscar-produto")
+        .addEventListener(
+
+            "input",
+
+            evento => {
+
+                estado.pesquisa =
+                    evento.target.value;
+
+
+                renderizarProdutos();
+
+            }
+
+        );
+
+
+    $("#filtros")
+        .addEventListener(
+
+            "click",
+
+            evento => {
+
+                const botao =
+
+                    evento.target.closest(
+                        "[data-categoria]"
+                    );
+
+
+                if (!botao) {
+
+                    return;
+
+                }
+
+
+                estado.categoria =
+                    botao.dataset.categoria;
+
+
+                renderizarFiltros();
+
+                renderizarProdutos();
+
+            }
+
+        );
+
+
+    $("#grade-produtos")
+        .addEventListener(
+
+            "click",
+
+            evento => {
+
+                const botao =
+
+                    evento.target.closest(
+                        "[data-adicionar]"
+                    );
+
+
+                if (!botao) {
+
+                    return;
+
+                }
+
+
+                adicionarCarrinho(
+
+                    botao.dataset.adicionar
+
+                );
+
+            }
+
+        );
+
+
+    $("#abrir-carrinho")
+        .addEventListener(
+
+            "click",
+
+            abrirCarrinho
+
+        );
+
+
+    $("#fechar-carrinho")
+        .addEventListener(
+
+            "click",
+
+            fecharCarrinho
+
+        );
+
+
+    $("#fundo-carrinho")
+        .addEventListener(
+
+            "click",
+
+            fecharCarrinho
+
+        );
+
+
+    document.addEventListener(
+
+        "keydown",
+
+        evento => {
+
+            if (
+
+                evento.key ===
+                "Escape"
+
+            ) {
+
+                fecharCarrinho();
+
+            }
+
+        }
+
     );
 
 
-    salvarCarrinho();
+    $("#itens-carrinho")
+        .addEventListener(
+
+            "click",
+
+            evento => {
+
+                const quantidade =
+
+                    evento.target.closest(
+                        "[data-quantidade]"
+                    );
 
 
-    // Atualiza categorias.
+                if (quantidade) {
 
-    const categorias = produtos.map(
+                    alterarQuantidade(
 
-        produto => produto.categoria
+                        quantidade.dataset.id,
 
-    );
+                        numero(
+                            quantidade.dataset.quantidade
+                        )
 
+                    );
 
-    if (
+                    return;
 
-        categoriaAtual !== "todos" &&
-
-        !categorias.includes(categoriaAtual)
-
-    ) {
-
-        categoriaAtual = "todos";
-
-    }
+                }
 
 
-    // Reconstrói a interface.
+                const remover =
 
-    criarFiltros();
-
-    mostrarProdutos();
-
-    atualizarCarrinho();
+                    evento.target.closest(
+                        "[data-remover]"
+                    );
 
 
-    console.log(
+                if (remover) {
 
-        "CriAItor 3D: catálogo atualizado.",
+                    removerCarrinho(
 
-        versaoAtual
+                        remover.dataset.remover
+
+                    );
+
+                }
+
+            }
+
+        );
+
+
+    $("#limpar-carrinho")
+        .addEventListener(
+
+            "click",
+
+            () => {
+
+                estado.carrinho =
+                    [];
+
+
+                salvarCarrinho();
+
+                renderizarCarrinho();
+
+
+                avisar(
+                    "Carrinho limpo."
+                );
+
+            }
+
+        );
+
+
+    $("#finalizar-pedido")
+        .addEventListener(
+
+            "click",
+
+            finalizarPedido
+
+        );
+
+
+    $("#tentar-novamente")
+        .addEventListener(
+
+            "click",
+
+            carregarCatalogo
+
+        );
+
+
+    document.addEventListener(
+
+        "visibilitychange",
+
+        () => {
+
+            if (!document.hidden) {
+
+                verificarAtualizacoes();
+
+            }
+
+        }
 
     );
 
 }
 
 
-// ==========================================
-// BUSCAR CATÁLOGO NO SUPABASE
-// ==========================================
+/* ===============================================
+   INICIAR
+=============================================== */
 
-async function carregarCatalogo() {
+async function iniciar() {
 
-    const { data, error } = await window.sb
+    carregarCarrinho();
 
-        .from("catalogo")
+    configurarEventos();
 
-        .select("produtos, versao")
-
-        .eq("id", 1)
-
-        .single();
+    renderizarCarrinho();
 
 
-    if (error) {
+    if (!sb) {
 
-        console.error(error);
+        $("#carregando").hidden =
+            true;
 
 
-        if (versaoAtual === -1) {
+        $("#erro-catalogo").hidden =
+            false;
 
-            $("grade-produtos").textContent =
 
-                "Não foi possível carregar os produtos. " +
+        $("#mensagem-erro-catalogo")
+            .textContent =
 
-                "Verifique sua conexão.";
-
-        }
+            "A conexão com o Supabase não foi inicializada.";
 
 
         return;
@@ -1426,105 +2056,46 @@ async function carregarCatalogo() {
     }
 
 
-    aplicarCatalogo(data);
+    await carregarCatalogo();
+
+
+    iniciarRealtime();
+
+
+    setInterval(
+
+        verificarAtualizacoes,
+
+        CONFIG.atualizacao
+
+    );
 
 }
 
 
-// ==========================================
-// SINCRONIZAÇÃO EM TEMPO REAL
-// ==========================================
+if (
 
-const canal = window.sb
+    document.readyState ===
+    "loading"
 
-    .channel("criaitor3d-catalogo-clientes")
+) {
 
-    .on(
+    document.addEventListener(
 
-        "postgres_changes",
+        "DOMContentLoaded",
+
+        iniciar,
 
         {
-
-            event: "UPDATE",
-
-            schema: "public",
-
-            table: "catalogo",
-
-            filter: "id=eq.1"
-
-        },
-
-        () => {
-
-            // Busca os dados mais recentes
-            // quando o banco é atualizado.
-
-            carregarCatalogo();
-
+            once: true
         }
 
-    )
+    );
 
-    .subscribe(status => {
+} else {
 
-        if (status === "SUBSCRIBED") {
+    iniciar();
 
-            carregarCatalogo();
+}
 
-        }
-
-    });
-
-
-// ==========================================
-// RECUPERAÇÃO DA CONEXÃO
-// ==========================================
-
-// Se a conexão em tempo real cair,
-// a loja consulta o catálogo novamente
-// a cada 45 segundos.
-
-setInterval(() => {
-
-    if (!document.hidden) {
-
-        carregarCatalogo();
-
-    }
-
-}, 45000);
-
-
-// Quando o cliente voltar à aba,
-// verifica a versão atualizada.
-
-document.addEventListener(
-
-    "visibilitychange",
-
-    () => {
-
-        if (!document.hidden) {
-
-            carregarCatalogo();
-
-        }
-
-    }
-
-);
-
-
-// ==========================================
-// INICIAR LOJA
-// ==========================================
-
-$("grade-produtos").textContent =
-    "Carregando produtos da CriAItor 3D...";
-
-
-$("finalizar-pedido").disabled = true;
-
-
-carregarCatalogo();
+})();
