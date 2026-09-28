@@ -1,46 +1,55 @@
-
-/*
-==========================================
-CRIAITOR 3D
-CONEXÃO SUPABASE - CLIENTES
-==========================================
-*/
-
-
-// URL DO PROJETO
+"use strict";
 
 const SUPABASE_URL =
-
     "https://odmshtzmvtgkuxnysqor.supabase.co";
 
-
-// CHAVE PÚBLICA DO PROJETO
-
 const SUPABASE_PUBLIC_KEY =
-
     "sb_publishable_iGeAejP8oNb0hUy7FhThIQ_MMbzZV2c";
 
 
-// CRIAR CONEXÃO
+if (!window.supabase) {
 
-window.sb = window.supabase.createClient(
+    throw new Error(
+        "Biblioteca do Supabase não carregada."
+    );
 
-    SUPABASE_URL,
+}
 
-    SUPABASE_PUBLIC_KEY,
 
-    {
+window.sb =
+    window.supabase.createClient(
 
-        auth: {
+        SUPABASE_URL,
 
-            persistSession: false,
+        SUPABASE_PUBLIC_KEY,
 
-            autoRefreshToken: false,
+        {
 
-            detectSessionInUrl: false
+            auth: {
+
+                persistSession: false,
+
+                autoRefreshToken: false,
+
+                detectSessionInUrl: false
+
+            }
 
         }
 
-    }
+    );
 
-);
+
+window.CRIAITOR_CLIENTE_CONFIG =
+    Object.freeze({
+
+        tabelaCatalogo:
+            "catalogo",
+
+        registroCatalogo:
+            1,
+
+        whatsapp:
+            "5551995748186"
+
+    });
